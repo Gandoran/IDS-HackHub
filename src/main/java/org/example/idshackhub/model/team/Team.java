@@ -1,4 +1,4 @@
-package org.example.idshackhub.team;
+package org.example.idshackhub.model.team;
 
 public class Team extends AbstractTeam {
     private String iban;

@@ -1,8 +1,8 @@
-package org.example.idshackhub.team.builder;
+package org.example.idshackhub.model.team.builder;
 
 import org.example.idshackhub.model.hackathon.Hackathon;
-import org.example.idshackhub.team.HackathonTeam;
-import org.example.idshackhub.team.Team;
+import org.example.idshackhub.model.team.HackathonTeam;
+import org.example.idshackhub.model.team.Team;
 
 public class HackathonTeamBuilder extends TeamBuilderAbstract<HackathonTeam, HackathonTeamBuilder> {
 

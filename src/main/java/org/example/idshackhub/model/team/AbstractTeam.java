@@ -1,6 +1,10 @@
-package org.example.idshackhub.team;
+package org.example.idshackhub.model.team;
+
+import org.example.idshackhub.model.user.User;
+import org.example.idshackhub.model.user.assignment.Context;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public abstract class AbstractTeam implements Context {
 
