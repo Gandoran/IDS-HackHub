@@ -1,4 +1,4 @@
-package org.example.idshackhub.team;
+package org.example.idshackhub.model.team;
 
 import org.example.idshackhub.model.hackathon.Hackathon;
 

@@ -1,6 +1,9 @@
-package org.example.idshackhub.team.builder;
+package org.example.idshackhub.model.team.builder;
 
-import org.example.idshackhub.team.AbstractTeam;
+import org.example.idshackhub.model.team.AbstractTeam;
+import org.example.idshackhub.model.user.User;
+
+import java.util.List;
 
 public abstract class TeamBuilderAbstract<V extends AbstractTeam, T extends TeamBuilderAbstract<V, T>> implements ITeamBuilder<V, T> {
 
@@ -19,13 +22,11 @@ public abstract class TeamBuilderAbstract<V extends AbstractTeam, T extends Team
         return self();
     }
 
-    @Override
     public T buildLeader(User leader) {
         team.setLeader(leader);
         return self();
     }
 
-    @Override
     public T buildMembers(List<User> members) {
         team.setMembers(members);
         return self();
