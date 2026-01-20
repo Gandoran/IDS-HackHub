@@ -1,12 +1,13 @@
 package unicam.it.idshackhub.model.team;
 
 import unicam.it.idshackhub.model.user.User;
+import unicam.it.idshackhub.model.user.assignment.BaseContext;
 import unicam.it.idshackhub.model.user.assignment.Context;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractTeam implements Context {
+public abstract class AbstractTeam extends BaseContext {
 
     private long id;
     private String name;
@@ -18,9 +19,8 @@ public abstract class AbstractTeam implements Context {
         this.id = id;
     }
 
-    public long getId() {
-        return id;
-    }
+    @Override
+    public long getId() {return id;}
 
     public void setName(String name) {
         this.name = name;

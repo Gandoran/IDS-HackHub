@@ -1,5 +1,8 @@
 package unicam.it.idshackhub.model.hackathon;
 
+import unicam.it.idshackhub.model.team.HackathonTeam;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class HackathonBuilder {
@@ -12,7 +15,7 @@ public class HackathonBuilder {
 
     public HackathonBuilder reset(){
         hackathon = new Hackathon();
-        hackathon.setTeams(List.of());
+        hackathon.setTeams(new ArrayList<>());
         return this;
     }
 

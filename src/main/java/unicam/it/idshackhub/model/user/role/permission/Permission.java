@@ -6,7 +6,7 @@ public enum Permission {
     Can_Create_Request,
     Can_Create_Hackathon,
     Can_Vote,
-    Can_End_Valutation_State,
+    Can_End_Evaluation_State,
     Can_Submit,
     Can_Register_Team,
     Can_Manage_Request,

@@ -8,7 +8,7 @@ import java.util.Set;
 
 public enum TeamRole implements Role {
     T_TeamMember(EnumSet.noneOf(Permission.class)),
-    T_TeamLeader(EnumSet.of(Permission.Can_Registrate_Team));
+    T_TeamLeader(EnumSet.of(Permission.Can_Register_Team, Permission.Can_Create_HackathonTeam));
 
     private final Set<Permission> permissions;
 

@@ -1,11 +1,12 @@
 package unicam.it.idshackhub.model.hackathon;
 
 import unicam.it.idshackhub.model.team.HackathonTeam;
+import unicam.it.idshackhub.model.user.assignment.BaseContext;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Hackathon {
+public class Hackathon extends BaseContext {
 
     public Hackathon(){}
 
@@ -13,7 +14,8 @@ public class Hackathon {
         this.id = id;
     }
 
-    public Long getId() {
+    @Override
+    public long getId() {
         return id;
     }
 
@@ -71,6 +73,7 @@ public class Hackathon {
     private TeamRules rules;
     private HackathonStaff staff = new HackathonStaff();
     private Schedule schedule;
-    List<HackathonTeam> teams = new ArrayList<>();
+    private List<HackathonTeam> teams = new ArrayList<>();
+
 
 }
