@@ -10,6 +10,10 @@ public class HackathonTeam extends AbstractTeam{
         this.mainTeam = mainTeam;
     }
 
+    public Team getMainTeam() {
+        return mainTeam;
+    }
+
     public void setHackathonParticipation(Hackathon hackathonParticipation) {
         this.hackathonParticipation = hackathonParticipation;
     }

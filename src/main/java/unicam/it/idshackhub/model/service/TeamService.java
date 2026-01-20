@@ -15,26 +15,37 @@ import static unicam.it.idshackhub.model.service.PermissionChecker.checkPermissi
 public class TeamService {
 
     public void registerTeam(User teamLeader, HackathonTeam hackathonTeam, Hackathon hackathon) {
-        if(!checkPermission(teamLeader, Permission.Can_Register_Team)) {
+        if(!checkPermission(teamLeader, Permission.Can_Register_Team, hackathonTeam.getMainTeam())) {
             throw new RuntimeException("Permission denied");}
+        if(hackathon.getTeams().contains(hackathonTeam)) {
+           throw new RuntimeException("Team already registered");}
         hackathon.getTeams().add(hackathonTeam);
     }
 
 
     public void createHackathonTeam(User teamLeader,String name,String description, User hackathonTeamLeader, List<User> HackathonTeamMembers) {
-        if(checkPermission(teamLeader, Permission.Can_Create_HackathonTeam)){
-            HackathonTeamBuilder builder = new HackathonTeamBuilder();
-            builder.buildName(name);
-            builder.buildDescription(description);
-            builder.buildLeader(hackathonTeamLeader);
-            builder.buildMainTeam(
-                    teamLeader.getContextByRole(TeamRole.T_TeamLeader)
-                            .map(context -> (Team) context)
-                            .orElseThrow(() -> new RuntimeException("Main Team not found"))
-            );
-            builder.buildMembers(HackathonTeamMembers);
-            HackathonTeam team = builder.getTeam();
+        Team mainTeam = teamLeader.getContextByRole(TeamRole.T_TeamLeader)
+                .map(context -> (Team) context)
+                .orElseThrow(() -> new RuntimeException("You have to be a Team Leader of a Main Team to create a Hackathon Team"));
+        if(!checkPermission(teamLeader, Permission.Can_Create_HackathonTeam, mainTeam)) {
+            throw new RuntimeException("Permission denied");
+        }
+
+        HackathonTeamBuilder builder = new HackathonTeamBuilder();
+        builder.buildName(name);
+        builder.buildDescription(description);
+        builder.buildLeader(hackathonTeamLeader);
+        builder.buildMainTeam(mainTeam);
+        builder.buildMembers(HackathonTeamMembers);
+
+        HackathonTeam hackTeam = builder.getTeam();
+
+        boolean alreadyExists = mainTeam.getHackathonTeams().stream()
+                .anyMatch(t -> t.getId() == hackTeam.getId());
+        if (alreadyExists) {
+            throw new RuntimeException("Team already exists");
+        }
+
+        mainTeam.getHackathonTeams().add(hackTeam);
         }
     }
-
-}

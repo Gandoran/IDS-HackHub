@@ -8,7 +8,7 @@ import java.util.List;
 public abstract class TeamBuilderAbstract<V extends AbstractTeam, T extends TeamBuilderAbstract<V, T>> implements ITeamBuilder<V, T> {
 
     protected V team;
-    protected abstract V createTeamInstance();
+    public abstract T reset();
 
     @Override
     public T buildName(String name) {
@@ -22,11 +22,13 @@ public abstract class TeamBuilderAbstract<V extends AbstractTeam, T extends Team
         return self();
     }
 
+    @Override
     public T buildLeader(User leader) {
         team.setLeader(leader);
         return self();
     }
 
+    @Override
     public T buildMembers(List<User> members) {
         team.setMembers(members);
         return self();

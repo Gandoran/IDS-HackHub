@@ -6,12 +6,12 @@ import unicam.it.idshackhub.model.team.Team;
 
 public class HackathonTeamBuilder extends TeamBuilderAbstract<HackathonTeam, HackathonTeamBuilder> {
 
-    @Override
-    protected HackathonTeam createTeamInstance() {
-        return new HackathonTeam();
+    public HackathonTeamBuilder() {
+        super.team = new HackathonTeam();
     }
 
     public HackathonTeamBuilder buildMainTeam(Team mainTeam) {
+
         team.setMainTeam(mainTeam);
         return this;
     }
@@ -21,4 +21,12 @@ public class HackathonTeamBuilder extends TeamBuilderAbstract<HackathonTeam, Hac
         team.setHackathonParticipation(h);
         return this;
     }
+
+
+    @Override
+    public HackathonTeamBuilder reset() {
+        team = new HackathonTeam();
+        return this;
+    }
+
 }
