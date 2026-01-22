@@ -16,8 +16,37 @@ import java.util.List;
 
 import static unicam.it.idshackhub.model.service.PermissionChecker.checkPermission;
 
+/**
+ * Service responsible for managing Hackathon Team operations.
+ * <p>
+ * This service handles the specialized logic for registering a sub-team ({@link HackathonTeam})
+ * to a specific Hackathon event. It orchestrates validation, object construction, and
+ * the assignment of event-specific roles.
+ * </p>
+ */
 public class TeamService {
 
+    /**
+     * Registers a new team for a specific Hackathon.
+     * <p>
+     * This method performs a sequence of operations:
+     * <ol>
+     * <li>Retrieves the Main Team context of the leader.</li>
+     * <li>Validates permissions, member availability, uniqueness, and hackathon rules.</li>
+     * <li>Builds the {@link HackathonTeam} object.</li>
+     * <li>Finalizes registration by linking entities and assigning roles.</li>
+     * </ol>
+     * </p>
+     *
+     * @param teamLeader          the leader of the Main Team initiating the registration.
+     * @param name                the name of the Hackathon Team.
+     * @param description         the description of the Hackathon Team.
+     * @param hackathonTeamLeader the user designated as the leader for this specific event.
+     * @param members             the list of members participating in the event.
+     * @param hackathon           the target Hackathon event.
+     * @return the fully registered {@link HackathonTeam}.
+     * @throws RuntimeException if any validation rule (permissions, size, uniqueness) is violated.
+     */
     public HackathonTeam registerHackathonTeam(User teamLeader, String name, String description, User hackathonTeamLeader, List<User> members, Hackathon hackathon) {
         Team mainTeam = this.getMainTeam(teamLeader);
 
@@ -39,6 +68,7 @@ public class TeamService {
             throw new RuntimeException("Permission denied");
         }
     }
+
 
     private void validateMembersAvailability(List<User> members, Hackathon hackathon) {
         for (User member : members) {
