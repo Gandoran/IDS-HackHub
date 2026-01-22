@@ -8,7 +8,7 @@ import java.util.Set;
 
 public enum HackathonRole implements Role {
     H_Judge(EnumSet.of(Permission.Can_Vote,Permission.Can_End_Evaluation_State)),
-    H_Organizator(EnumSet.of(Permission.Can_Proclamate_Winner,Permission.Can_Invite_Judge)),
+    H_Organizer(EnumSet.of(Permission.Can_Proclamate_Winner,Permission.Can_Invite_Judge)),
     H_HackathonTeamMember(EnumSet.noneOf(Permission.class)),
     H_HackathonTeamLeader(EnumSet.of(Permission.Can_Submit));
 

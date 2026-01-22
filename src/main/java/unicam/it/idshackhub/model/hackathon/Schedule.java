@@ -1,7 +1,12 @@
 package unicam.it.idshackhub.model.hackathon;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
 public class Schedule {
     private LocalDateTime startRegistrationDate;
     private LocalDateTime startDate;

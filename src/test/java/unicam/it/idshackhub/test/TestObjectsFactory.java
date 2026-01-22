@@ -12,51 +12,48 @@ import unicam.it.idshackhub.model.user.role.GlobalRole;
 import unicam.it.idshackhub.model.user.role.HackathonRole;
 import unicam.it.idshackhub.model.user.role.Role;
 import unicam.it.idshackhub.model.user.role.TeamRole;
+import unicam.it.idshackhub.model.utils.Request;
 
-import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 public class TestObjectsFactory {
 
-    /**
-     * Crea un utente generico con un ruolo globale.
-     */
-    public static User createUser(Long id, String username, GlobalRole globalRole) {
-        User user = new User();
-        user.setId(id);
-        user.setUsername(username);
-        user.setEmail(username.toLowerCase() + "@test.com");
-        user.setGlobalRole(globalRole);
-        user.setAssignments(new ArrayList<>());
+    public static User createUser(Long id, String username, String password) {
+        return new User(id, username, username + "@test.com", password);
+    }
+
+    public static User createVerifiedUser(Long id, String username, String password) {
+        User user = new User(id, username, username + "@test.com", password);
+        user.setGlobalRole(GlobalRole.G_VerifiedUser);
         return user;
     }
 
-    /**
-     * Crea un Team principale (Azienda/Gruppo stabile).
-     */
+    public static User createAdmin(Long id, String username, String password) {
+        User user = new User(id, username, username + "@test.com", password);
+        user.setGlobalRole(GlobalRole.G_SystemAdmin);
+        return user;
+    }
+
     public static Team createMainTeam(Long id, String name, User leader) {
         TeamBuilder builder = new TeamBuilder();
         Team team = builder.reset()
-                .buildIban("IT"+name.toUpperCase()+"00000000000000000")
                 .buildName(name)
                 .buildDescription("Description for " + name)
                 .buildLeader(leader)
                 .buildMembers(new ArrayList<>())
-                .getTeam();
+                .buildIban("IT" + name.toUpperCase() + "00000000000000000")
+                .getResult();
         team.setId(id);
-        if (leader != null) {
-            Assignment assignment = createAssignment(team, TeamRole.T_TeamLeader);
-            leader.getAssignments().add(assignment);
 
-        }
+        AddAssignment(leader, team, TeamRole.T_TeamLeader);
+        leader.setUserTeam(team);
+
         return team;
     }
 
-    /**
-     * Crea un HackathonTeam collegato a un mainTeam e ad un hackathon.
-     */
-    public static HackathonTeam createHackathonTeam(Long id, String name, Team mainTeam, User leader, ArrayList<User> members, Hackathon hackathon) {
+    public static HackathonTeam createHackathonTeam(Long id, String name, Team mainTeam, User leader, List<User> members, Hackathon hackathon) {
         HackathonTeamBuilder builder = new HackathonTeamBuilder();
         HackathonTeam team = builder.reset()
                 .buildMainTeam(mainTeam)
@@ -65,21 +62,33 @@ public class TestObjectsFactory {
                 .buildLeader(leader)
                 .buildMembers(members)
                 .buildHackathonParticipation(hackathon)
-                .getTeam();
+                .getResult();
         team.setId(id);
-        return team;
 
+        if (!mainTeam.getHackathonTeams().contains(team)) {
+            mainTeam.getHackathonTeams().add(team);
+        }
+
+        if (hackathon != null) {
+            if (!hackathon.getTeams().contains(team)) {
+                hackathon.getTeams().add(team);
+            }
+
+            for (User member : members) {
+                AddAssignment(member, hackathon, HackathonRole.H_HackathonTeamMember);
+            }
+            AddAssignment(leader, hackathon, HackathonRole.H_HackathonTeamLeader);
+        }
+
+        return team;
     }
 
-    /**
-     * Crea un Hackathon con date valide.
-     */
     public static Hackathon createHackathon(Long id, String title, User organizer) {
         LocalDateTime now = LocalDateTime.now();
         Schedule schedule = new Schedule(
-                now,              // Registrazione iniziata
-                now.plusDays(1),  // Evento inizia dopo
-                now.plusDays(2),  // Evento finisce
+                now,
+                now.plusDays(1),
+                now.plusDays(2),
                 "Online"
         );
         TeamRules rules = new TeamRules(20, 1, 5, 1);
@@ -90,40 +99,35 @@ public class TestObjectsFactory {
                 .buildDescription("Test Description for " + title)
                 .buildRules(rules)
                 .buildSchedule(schedule)
+                .buildStaff(organizer)
                 .getResult();
 
         h.setId(id);
-        h.getStaff().setOrganizer(organizer);
+        organizer.setGlobalRole(GlobalRole.G_VerifiedUser);
 
-        // LOGICA DI ASSEGNAZIONE RUOLO ORGANIZZATORE
-        if (organizer != null) {
-            Assignment assignment = createAssignment(h, HackathonRole.H_Organizator);
-            organizer.getAssignments().add(assignment);
-        }
+        AddAssignment(organizer, h, HackathonRole.H_Organizer);
 
         return h;
     }
 
-    /**
-     * Metodo Helper per creare Assignment anche senza costruttore pubblico.
-     * Usa la REFLECTION per forzare i campi privati.
-     */
-    public static Assignment createAssignment(BaseContext context, Role role) {
-        Assignment assignment = new Assignment();
-        try {
-            // Setta il campo 'context'
-            Field contextField = Assignment.class.getDeclaredField("context");
-            contextField.setAccessible(true);
-            contextField.set(assignment, context);
+    public static Request createRequest(Long id, User user, String description) {
+        return new Request(id, user, description);
+    }
 
-            // Setta il campo 'role'
-            Field roleField = Assignment.class.getDeclaredField("role");
-            roleField.setAccessible(true);
-            roleField.set(assignment, role);
+    public static TeamRules createTeamRules() {
+        return new TeamRules(20, 1, 5, 1);
+    }
 
-        } catch (Exception e) {
-            throw new RuntimeException("Errore nella creazione dell'Assignment di test: " + e.getMessage());
+    public static Schedule createSchedule() {
+        return new Schedule(LocalDateTime.now(), LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), "Online");
+    }
+
+    private static void AddAssignment(User user, BaseContext context, Role role) {
+        boolean alreadyAssigned = user.getAssignments().stream()
+                .anyMatch(a -> a.getContext().equals(context) && a.getRole().equals(role));
+
+        if (!alreadyAssigned) {
+            user.getAssignments().add(new Assignment(context, role));
         }
-        return assignment;
     }
 }

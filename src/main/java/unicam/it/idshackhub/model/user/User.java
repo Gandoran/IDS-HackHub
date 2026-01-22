@@ -1,5 +1,8 @@
 package unicam.it.idshackhub.model.user;
 
+import lombok.Getter;
+import lombok.Setter;
+import unicam.it.idshackhub.model.team.Team;
 import unicam.it.idshackhub.model.user.assignment.Assignment;
 import unicam.it.idshackhub.model.user.assignment.Context;
 import unicam.it.idshackhub.model.user.role.GlobalRole;
@@ -9,63 +12,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
+@Getter
+@Setter
 public class User {
     private long id;
     private String username;
     private String email;
     private String passwordHash;
     private GlobalRole globalRole;
+    private List<Assignment> assignments;
+    private Team userTeam;
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
+    public User(long id,String username,String email,String passwordHash){
         this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
+        this.globalRole = GlobalRole.G_NormalUser;
+        this.assignments = new ArrayList<>();
+        this.userTeam = null;
     }
-
-    public GlobalRole getGlobalRole() {
-        return globalRole;
-    }
-
-    public void setGlobalRole(GlobalRole globalRole) {
-        this.globalRole = globalRole;
-    }
-
-    public List<Assignment> getAssignments() {
-        return assignments;
-    }
-
-    public void setAssignments(List<Assignment> assignments) {
-        this.assignments = assignments;
-    }
-
-    private List<Assignment> assignments = new ArrayList<>();
 
     public Optional<Role> getRoleByContext(Context context) {
         return assignments.stream()
