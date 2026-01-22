@@ -1,5 +1,10 @@
 package unicam.it.idshackhub.model.hackathon;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class TeamRules {
     private int maxTeams;
     private int minTeams;

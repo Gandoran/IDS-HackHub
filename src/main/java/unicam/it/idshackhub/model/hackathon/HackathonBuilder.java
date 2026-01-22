@@ -1,6 +1,7 @@
 package unicam.it.idshackhub.model.hackathon;
 
 import unicam.it.idshackhub.model.team.HackathonTeam;
+import unicam.it.idshackhub.model.user.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +40,8 @@ public class HackathonBuilder {
         return this;
     }
 
-    public HackathonBuilder buildStaff(){
-        this.hackathon.setStaff(new HackathonStaff());
+    public HackathonBuilder buildStaff(User organizer){
+        this.hackathon.setStaff(new HackathonStaff(organizer));
         return this;
     }
 

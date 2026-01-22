@@ -35,7 +35,7 @@ public abstract class TeamBuilderAbstract<V extends AbstractTeam, T extends Team
     }
 
     @Override
-    public V getTeam() {
+    public V getResult() {
         return team;
     }
 

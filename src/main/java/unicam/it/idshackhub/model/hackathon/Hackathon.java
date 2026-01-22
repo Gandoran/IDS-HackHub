@@ -1,79 +1,20 @@
 package unicam.it.idshackhub.model.hackathon;
 
+import lombok.Getter;
+import lombok.Setter;
 import unicam.it.idshackhub.model.team.HackathonTeam;
 import unicam.it.idshackhub.model.user.assignment.BaseContext;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
 public class Hackathon extends BaseContext {
-
-    public Hackathon(){}
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public TeamRules getRules() {
-        return rules;
-    }
-
-    public void setRules(TeamRules rules) {
-        this.rules = rules;
-    }
-
-    public HackathonStaff getStaff() {
-        return staff;
-    }
-
-    public void setStaff(HackathonStaff staff) {
-        this.staff = staff;
-    }
-
-    public Schedule getSchedule() {
-        return schedule;
-    }
-
-    public void setSchedule(Schedule schedule) {
-        this.schedule = schedule;
-    }
-
-    public List<HackathonTeam> getTeams() {
-        return teams;
-    }
-
-    public void setTeams(List<HackathonTeam> teams) {
-        this.teams = teams;
-    }
-
-    private Long id;
     private String title;
     private String description;
     private TeamRules rules;
-    private HackathonStaff staff = new HackathonStaff();
+    private HackathonStaff staff;
     private Schedule schedule;
     private List<HackathonTeam> teams = new ArrayList<>();
-
-
 }

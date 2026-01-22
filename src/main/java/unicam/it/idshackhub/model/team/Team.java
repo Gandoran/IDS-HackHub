@@ -1,25 +1,24 @@
 package unicam.it.idshackhub.model.team;
 
-import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.List;
+import java.util.Objects;
+
+@Getter
+@Setter
 public class Team extends AbstractTeam {
     private String iban;
+    private List<HackathonTeam> hackathonTeams;
 
-    public void setIban(String iban) {
-        this.iban = iban;
-    }
-    public String getIban() {
-        return iban;
-    }
-
-    public void setHackathonTeams(List<HackathonTeam> hackathonTeams) {this.hackathonTeams = hackathonTeams;}
-    public List<HackathonTeam> getHackathonTeams() {return hackathonTeams;}
-    public HackathonTeam getHackathonTeamById(long id) {
-        return hackathonTeams.stream()
-                .filter(team -> team.getId() == id)
-                .findFirst()
-                .orElse(null);
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Team that = (Team) o;
+        return Objects.equals(this.getLeader(), that.getLeader());
     }
 
-    public List<HackathonTeam> hackathonTeams;
+
 }

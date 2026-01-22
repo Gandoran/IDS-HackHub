@@ -10,6 +10,6 @@ public interface ITeamBuilder<V extends AbstractTeam, T extends ITeamBuilder<V, 
     T buildDescription(String description);
     T buildLeader(User leader);
     T buildMembers(List<User> members);
-    V getTeam();
+    V getResult();
     T reset();
 }

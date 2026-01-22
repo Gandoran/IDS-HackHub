@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Set;
 
 public enum GlobalRole implements Role {
-    G_VerifiedUser(EnumSet.of(Permission.Can_Create_Hackathon)),
+    G_VerifiedUser(EnumSet.of(Permission.Can_Create_Hackathon,Permission.Can_Create_Team)),
     G_SystemAdmin(EnumSet.of(Permission.Can_Manage_Request)),
-    G_NormalUser(EnumSet.of(Permission.Can_Create_Request));
+    G_NormalUser(EnumSet.of(Permission.Can_Create_Request,Permission.Can_Create_Team));
 
     private final Set<Permission> permissions;
 
