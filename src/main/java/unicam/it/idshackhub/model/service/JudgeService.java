@@ -25,7 +25,7 @@ public class JudgeService {
     }
 
     public HackathonStatus closeEvaluationState(User judge, Hackathon hackathon){
-        if(!checkPermission(judge,Permission.Can_End_Valuation_State,hackathon)){
+        if(!checkPermission(judge,Permission.Can_End_Evaluation_State,hackathon)){
             throw new RuntimeException("Permission denied");
         }
         for(Submission submission: hackathon.getSubmissions()){

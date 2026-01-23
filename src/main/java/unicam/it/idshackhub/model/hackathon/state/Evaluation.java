@@ -8,15 +8,14 @@ public class Evaluation implements HackathonState {
     @Override
     public boolean isActionAllowed(Permission perm) {
         return switch (perm) {
-            case Can_Vote -> true;
-            case Can_End_Valuation_State -> true;
+            case Can_Vote, Can_End_Evaluation_State -> true;
             default -> false;
         };
     }
 
     /**
      * Automatic transition:
-     * Valutation -> Conclusion when all submissions have a vote.
+     * Evaluation -> Conclusion when all submissions have a vote.
      */
     @Override
     public void updateState(Hackathon context) {

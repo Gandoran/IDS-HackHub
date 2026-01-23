@@ -24,9 +24,9 @@ public class Registration implements HackathonState {
 
     /**
      * Automatic transition:
-     * Registration -> Inprogress when now >= schedule.startDate
+     * Registration -> InProgress when now >= schedule.startDate
      *
-     * Fail-fast (no Cancelled): if transition time arrives but prerequisites are missing,
+     * Fail-fast: if transition time arrives but prerequisites are missing,
      * throws IllegalStateException.
      */
     @Override
@@ -36,7 +36,6 @@ public class Registration implements HackathonState {
 
         if (LocalDateTime.now().isBefore(schedule.getStartDate())) return;
 
-        // prerequisites to start the hackathon
         if (context.getStaff() == null || context.getStaff().getJudge() == null) {
             throw new IllegalStateException("Cannot start hackathon: missing judge");
         }

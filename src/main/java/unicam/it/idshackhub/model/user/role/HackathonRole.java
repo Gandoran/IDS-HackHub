@@ -19,7 +19,7 @@ public enum HackathonRole implements Role {
      * A judge responsible for evaluating projects.
      * Has permissions to vote and end the evaluation phase.
      */
-    H_Judge(EnumSet.of(Permission.Can_Vote, Permission.Can_End_Valuation_State)),
+    H_Judge(EnumSet.of(Permission.Can_Vote, Permission.Can_End_Evaluation_State)),
 
     /**
      * The event organizer.

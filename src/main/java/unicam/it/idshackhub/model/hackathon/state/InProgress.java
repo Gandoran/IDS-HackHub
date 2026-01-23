@@ -7,7 +7,7 @@ import unicam.it.idshackhub.model.user.role.permission.Permission;
 import java.time.LocalDateTime;
 
 /**
- * In-Inprogress phase:
+ * In-Progress phase:
  * - Teams can submit their project
  */
 public class InProgress implements HackathonState {
@@ -22,9 +22,9 @@ public class InProgress implements HackathonState {
 
     /**
      * Automatic transition:
-     * Inprogress -> Valutation when now >= schedule.endDate
+     * InProgress -> Evaluation when now >= schedule.endDate
      *
-     * Fail-fast (no Cancelled): if transition time arrives but there are no submissions,
+     * Fail-fast: if transition time arrives but there are no submissions,
      * throws IllegalStateException.
      */
     @Override
@@ -34,7 +34,6 @@ public class InProgress implements HackathonState {
 
         if (LocalDateTime.now().isBefore(schedule.getEndDate())) return;
 
-        // keep only teams that submitted something
         if (context.getTeams() != null) {
             context.getTeams().removeIf(t -> t.getSubmission() == null);
         }
@@ -43,6 +42,6 @@ public class InProgress implements HackathonState {
             throw new IllegalStateException("Cannot move to evaluation: no submissions were posted");
         }
 
-        context.setStatus(HackathonStatus.IN_PROGRESS);
+        context.setStatus(HackathonStatus.EVALUATION);
     }
 }

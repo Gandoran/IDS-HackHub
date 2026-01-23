@@ -20,7 +20,7 @@ import java.util.Objects;
  * This class serves as a {@link BaseContext}, meaning it acts as a context
  * for defining specific user roles and permissions (e.g., Organizer, Judge).
  * It aggregates all necessary information regarding the event, including
- * rules, scheduling, staff, and participating teams.
+ * rules, scheduling, staff, participating teams and their submissions.
  * </p>
  */
 @Getter
@@ -63,7 +63,7 @@ public class Hackathon extends BaseContext {
     private List<Submission> submissions = new ArrayList<>();
 
     /**
-     * The current phase/state of the Hackathon (State pattern).
+     * The current phase/state of the Hackathon.
      */
     private HackathonStatus status = HackathonStatus.REGISTRATION;
 
