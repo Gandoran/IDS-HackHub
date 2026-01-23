@@ -20,7 +20,7 @@ public enum Permission {
     /** Permission to cast a vote on projects during a Hackathon. */
     Can_Vote,
     /** Permission to close the evaluation phase of a Hackathon. */
-    Can_End_Evaluation_State,
+    Can_End_Valuation_State,
     /** Permission to submit a final project for a Hackathon. */
     Can_Submit,
     /** Permission to register a sub-team to a specific Hackathon event. */

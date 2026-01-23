@@ -51,6 +51,7 @@ public class TeamService {
         Team mainTeam = this.getMainTeam(teamLeader);
 
         validatePermissions(teamLeader, mainTeam);
+        validateHackathonPermissions(hackathon);
         validateMembersAvailability(members, hackathon);
         validateMainTeamUniqueness(mainTeam, hackathon);
         validateHackathonRules(members.size(), hackathon);
@@ -66,6 +67,12 @@ public class TeamService {
     private void validatePermissions(User user, Team mainTeam) {
         if (!checkPermission(user, Permission.Can_Register_Team, mainTeam)) {
             throw new RuntimeException("Permission denied");
+        }
+    }
+
+    private void validateHackathonPermissions(Hackathon hackathon) {
+        if(!hackathon.isActionAllowed(Permission.Can_Register_Team)){
+            throw new RuntimeException("Permission denied by hackathon");
         }
     }
 

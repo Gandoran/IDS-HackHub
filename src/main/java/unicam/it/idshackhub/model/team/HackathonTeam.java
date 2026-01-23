@@ -3,6 +3,7 @@ package unicam.it.idshackhub.model.team;
 import lombok.Getter;
 import lombok.Setter;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
+import unicam.it.idshackhub.model.utils.Submission;
 
 import java.util.Objects;
 
@@ -28,6 +29,11 @@ public class HackathonTeam extends AbstractTeam {
      * The Hackathon event this team is registered for.
      */
     private Hackathon hackathonParticipation;
+
+    /**
+     * The submission posted by this team for the hackathon (if any).
+     */
+    private Submission submission;
 
     /**
      * Checks equality based on the Business Key (MainTeam + Hackathon).
