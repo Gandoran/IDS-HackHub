@@ -1,6 +1,8 @@
 package unicam.it.idshackhub.model.hackathon;
 
+import jakarta.persistence.Embeddable;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -10,8 +12,9 @@ import lombok.Setter;
  * and the number of members allowed within a single team.
  * </p>
  */
-@Setter
-@Getter
+@Embeddable
+@Getter @Setter
+@NoArgsConstructor
 public class TeamRules {
 
     /**

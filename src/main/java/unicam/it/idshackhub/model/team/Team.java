@@ -1,8 +1,13 @@
 package unicam.it.idshackhub.model.team;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -14,8 +19,9 @@ import java.util.Objects;
  * via the {@link #hackathonTeams} list.
  * </p>
  */
-@Getter
-@Setter
+@Entity
+@Table(name = "team")
+@Getter @Setter
 public class Team extends AbstractTeam {
 
     /**
@@ -27,7 +33,8 @@ public class Team extends AbstractTeam {
     /**
      * A historical list of all Hackathon participations (sub-teams) created by this organization.
      */
-    private List<HackathonTeam> hackathonTeams;
+    @OneToMany(mappedBy = "mainTeam", cascade = CascadeType.ALL)
+    private List<HackathonTeam> hackathonTeams = new ArrayList<>();
 
     /**
      * Checks equality based on the Team Leader.

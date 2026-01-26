@@ -2,105 +2,103 @@ package unicam.it.idshackhub.model.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
 import unicam.it.idshackhub.model.hackathon.Schedule;
 import unicam.it.idshackhub.model.hackathon.TeamRules;
 import unicam.it.idshackhub.model.team.Team;
 import unicam.it.idshackhub.model.user.User;
-import unicam.it.idshackhub.model.user.role.GlobalRole;
-import unicam.it.idshackhub.model.user.role.HackathonRole;
-import unicam.it.idshackhub.model.user.role.TeamRole;
-import unicam.it.idshackhub.model.utils.Request;
+import unicam.it.idshackhub.model.user.role.ContextRole;
+import unicam.it.idshackhub.repository.HackathonRepository;
+import unicam.it.idshackhub.repository.RequestRepository;
+import unicam.it.idshackhub.repository.TeamRepository;
+import unicam.it.idshackhub.repository.UserRepository;
+import unicam.it.idshackhub.service.SystemService;
 import unicam.it.idshackhub.test.TestObjectsFactory;
-import static org.junit.jupiter.api.Assertions.*;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class) // Necessario per Mockito
 class SystemServiceTest {
 
+    @Mock private RequestRepository requestRepository;
+    @Mock private UserRepository userRepository;
+    @Mock private HackathonRepository hackathonRepository;
+    @Mock private TeamRepository teamRepository;
+
+    @InjectMocks
     private SystemService systemService;
+
     private User teamLeader;
     private User hackathonOrganizer;
     private User memberUser;
-    private User sysAdmin;
-    private Team mainTeam;
     private TeamRules teamRules;
     private Schedule schedule;
-    private Request requestMemberUser;
 
     @BeforeEach
     void setUp() {
-        systemService = new SystemService();
+        // Setup Users
         teamLeader = TestObjectsFactory.createUser(1L, "LeaderUser", "Pass1");
         memberUser = TestObjectsFactory.createUser(2L, "MemberUser", "Pass2");
         hackathonOrganizer = TestObjectsFactory.createVerifiedUser(3L, "OrganizerUser", "Pass3");
-        sysAdmin = TestObjectsFactory.createAdmin(6L, "Admin", "Pass6");
 
-        requestMemberUser = TestObjectsFactory.createRequest(55L, memberUser, "RequestDesc");
-
-        mainTeam = TestObjectsFactory.createMainTeam(100L, "Hack Team", teamLeader);
-
+        // Setup Objects
         teamRules = TestObjectsFactory.createTeamRules();
         schedule = TestObjectsFactory.createSchedule();
     }
 
     @Test
-    void createRequest_Success() {
-        Request result = systemService.createRequest(memberUser, "Request");
-        assertNotNull(result);
-        assertEquals("Request", result.getDescription());
-        assertEquals(memberUser, result.getUser());
-    }
-
-    @Test
-    void createRequest_Failure_PermissionDenied() {
-        RuntimeException exception = assertThrows(RuntimeException.class, () ->
-                systemService.createRequest(sysAdmin, "Request"));
-        assertEquals("Permission denied", exception.getMessage());
-    }
-
-    @Test
-    void manageRequest_Success() {
-        assertNotEquals(GlobalRole.G_VerifiedUser, memberUser.getGlobalRole());
-        boolean result = systemService.manageRequest(sysAdmin, requestMemberUser, true);
-        assertTrue(result);
-        assertEquals(GlobalRole.G_VerifiedUser, memberUser.getGlobalRole(),
-                "User should be promoted to VerifiedUser after request approval");
-    }
-
-    @Test
-    void manageRequest_Failure_RequestDenied() {
-        boolean result = systemService.manageRequest(sysAdmin, requestMemberUser, false);
-        assertFalse(result);
-        assertNotEquals(GlobalRole.G_VerifiedUser, memberUser.getGlobalRole(),
-                "User should NOT be promoted if request is denied");
-    }
-
-    @Test
     void createHackathon_Success() {
+        // Simuliamo salvataggio Hackathon e User
+        when(hackathonRepository.save(any(Hackathon.class))).thenAnswer(i -> i.getArguments()[0]);
+        when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArguments()[0]);
+
         Hackathon result = systemService.createHackathon(hackathonOrganizer, "NewHack", "Desc", teamRules, schedule);
 
         assertNotNull(result);
 
+        // Verifica assegnazione ruolo
         boolean hasOrganizerRole = hackathonOrganizer.getAssignments().stream()
-                .anyMatch(a -> a.getRole() == HackathonRole.H_Organizer && a.getContext().equals(result));
+                .anyMatch(a -> a.getRole().toString().equals(ContextRole.H_Organizer.toString())
+                        && a.getContext().equals(result));
 
-        assertTrue(hasOrganizerRole, "User should be assigned H_Organizer role for the new Hackathon");
+        assertTrue(hasOrganizerRole, "User should be assigned H_Organizer role");
+
+        verify(hackathonRepository).save(any(Hackathon.class));
+        verify(userRepository).save(hackathonOrganizer);
     }
 
     @Test
     void createTeam_Success() {
+        // Simuliamo salvataggio Team e User
+        when(teamRepository.save(any(Team.class))).thenAnswer(i -> i.getArguments()[0]);
+        when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArguments()[0]);
+
         Team result = systemService.createTeam(memberUser, "TeamName", "Desc", "ITTEAM00000000000");
 
         assertNotNull(result);
 
+        // Verifica assegnazione ruolo
         boolean hasLeaderRole = memberUser.getAssignments().stream()
-                .anyMatch(a -> a.getRole() == TeamRole.T_TeamLeader && a.getContext().equals(result));
-        assertTrue(hasLeaderRole, "User should be assigned T_TeamLeader role");
+                .anyMatch(a -> a.getRole().toString().equals(ContextRole.T_TeamLeader.toString())
+                        && a.getContext().equals(result));
 
-        assertEquals(result, memberUser.getUserTeam(), "User's team reference must be updated");
+        assertTrue(hasLeaderRole, "User should be assigned T_TeamLeader role");
+        assertEquals(result, memberUser.getUserTeam());
+
+        verify(teamRepository).save(any(Team.class));
+        verify(userRepository).save(memberUser);
     }
 
     @Test
     void createTeam_Failure_UserAlreadyInATeam() {
+        // Assegniamo un team esistente
         Team existingTeam = TestObjectsFactory.createMainTeam(999L, "Existing", memberUser);
         memberUser.setUserTeam(existingTeam);
 

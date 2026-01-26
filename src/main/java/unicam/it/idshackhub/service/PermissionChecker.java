@@ -1,12 +1,8 @@
-package unicam.it.idshackhub.model.service;
+package unicam.it.idshackhub.service;
 
-import unicam.it.idshackhub.model.hackathon.Hackathon;
 import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.assignment.Context;
 import unicam.it.idshackhub.model.user.role.permission.Permission;
-
-import java.util.Objects;
-import java.util.function.Supplier;
 
 /**
  * Utility class responsible for verifying User permissions within the system.

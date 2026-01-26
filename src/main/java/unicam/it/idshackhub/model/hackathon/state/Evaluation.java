@@ -14,16 +14,16 @@ public class Evaluation implements HackathonState {
     }
 
     /**
-     * Automatic transition:
-     * Evaluation -> Conclusion when all submissions have a vote.
+     * Performs the automatic transition to {@link HackathonStatus#CONCLUSION} when all submissions have been voted.
+     *
+     * @param context the hackathon context
+     * @throws RuntimeException if not all submissions have a vote
      */
     @Override
     public void updateState(Hackathon context) {
         boolean allVoted = context.getSubmissions().stream()
                 .allMatch(s -> s.getVote() != null);
-
-        if (!allVoted) return;
-
+        if (!allVoted) throw new RuntimeException("Not all submissions are voted");
         context.setStatus(HackathonStatus.CONCLUSION);
     }
 }

@@ -1,11 +1,10 @@
 package unicam.it.idshackhub.model.team;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.assignment.BaseContext;
-import unicam.it.idshackhub.model.user.assignment.Context;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,8 +17,8 @@ import java.util.List;
  * assigned within the scope of any team.
  * </p>
  */
-@Getter
-@Setter
+@MappedSuperclass
+@Getter @Setter
 public abstract class AbstractTeam extends BaseContext {
 
     /**
@@ -38,10 +37,18 @@ public abstract class AbstractTeam extends BaseContext {
      * Note: The leader typically holds special permissions (e.g., registering the team).
      * </p>
      */
+    @ManyToOne
+    @JoinColumn(name = "leader_id")
     private User leader;
 
     /**
      * The list of users who are members of this team.
      */
+    @ManyToMany
+    @JoinTable(
+            name = "team_members",
+            joinColumns = @JoinColumn(name = "team_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
     private List<User> members = new ArrayList<>();
 }

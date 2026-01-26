@@ -1,9 +1,11 @@
 package unicam.it.idshackhub.model.user.assignment;
 
-import lombok.AllArgsConstructor;
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import unicam.it.idshackhub.model.user.role.Role;
+import unicam.it.idshackhub.model.user.User;
+import unicam.it.idshackhub.model.user.role.*;
 
 /**
  * Represents a specific association between a Context and a Role.
@@ -14,18 +16,34 @@ import unicam.it.idshackhub.model.user.role.Role;
  * {@link BaseContext} (e.g., "Team Alpha").
  * </p>
  */
+@Entity
 @Getter
 @Setter
-@AllArgsConstructor
+@NoArgsConstructor
 public class Assignment {
+
+    /**
+     * The unique identifier for this Assignment entity.
+     */
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private long id;
 
     /**
      * The specific environment or entity where this assignment is valid (e.g., a specific Hackathon or Team).
      */
+    @ManyToOne @JoinColumn(name = "context_id", nullable = false)
     private BaseContext context;
+
 
     /**
      * The role granted to the user within the specified context.
      */
-    private Role role;
+    @ManyToOne @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Enumerated(EnumType.STRING) private ContextRole role;
+
+    public Assignment(BaseContext context, ContextRole role) {
+        this.context = context;
+        this.role = role;
+    }
 }

@@ -1,5 +1,6 @@
 package unicam.it.idshackhub.model.team;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
@@ -16,23 +17,29 @@ import java.util.Objects;
  * if rules allow), while tracking the specific members for that occasion.
  * </p>
  */
-@Getter
-@Setter
+@Entity
+@Table(name = "hackathon_team")
+@Getter @Setter
 public class HackathonTeam extends AbstractTeam {
 
     /**
      * The permanent parent team that spawned this participation group.
      */
+    @ManyToOne
+    @JoinColumn(name = "main_team_id")
     private Team mainTeam;
 
     /**
      * The Hackathon event this team is registered for.
      */
+    @ManyToOne
+    @JoinColumn(name = "hackathon_id")
     private Hackathon hackathonParticipation;
 
     /**
      * The submission posted by this team for the hackathon (if any).
      */
+    @OneToOne(mappedBy = "team", cascade = CascadeType.ALL)
     private Submission submission;
 
     /**

@@ -23,12 +23,19 @@ public class Registration implements HackathonState {
     }
 
     /**
-     * Automatic transition:
-     * Registration -> InProgress when now >= schedule.startDate
+     * Advances the hackathon to the {@link HackathonStatus#IN_PROGRESS} phase once the start date has been reached.
+     * <p>
+     * This transition is time-driven: if the hackathon schedule (or its start date) is missing, or the current time is still
+     * before the start date, the state is not changed.
+     * <p>
+     * When the start date is reached, the method verifies that the hackathon is ready to begin:
+     * a judge must be assigned and the minimum number of teams required by the rules must be met.
      *
-     * Fail-fast: if transition time arrives but prerequisites are missing,
-     * throws IllegalStateException.
+     * @param context the hackathon whose state may be updated
+     * @throws IllegalStateException if the hackathon is due to start but a judge is missing
+     * @throws IllegalStateException if the hackathon is due to start but the minimum number of teams is not reached
      */
+
     @Override
     public void updateState(Hackathon context) {
         Schedule schedule = context.getSchedule();

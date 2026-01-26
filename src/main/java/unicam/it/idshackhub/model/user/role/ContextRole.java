@@ -6,14 +6,18 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Defines roles specific to the context of a Hackathon event.
- * <p>
- * These roles are only active and valid when the user is interacting with the specific
- * {@link unicam.it.idshackhub.model.hackathon.Hackathon} entity they are assigned to.
- * </p>
- */
-public enum HackathonRole implements Role {
+public enum ContextRole implements Role {
+    /**
+     * A standard member of the team.
+     * Currently grants no administrative permissions within the team structure.
+     */
+    T_TeamMember(EnumSet.noneOf(Permission.class)),
+
+    /**
+     * The leader/manager of the team.
+     * Has permissions to register the team for events and create hackathon sub-teams.
+     */
+    T_TeamLeader(EnumSet.of(Permission.Can_Register_Team, Permission.Can_Create_HackathonTeam)),
 
     /**
      * A judge responsible for evaluating projects.
@@ -44,12 +48,7 @@ public enum HackathonRole implements Role {
      */
     private final Set<Permission> permissions;
 
-    /**
-     * Constructs a role with a defined set of permissions.
-     *
-     * @param permissions the permissions to grant.
-     */
-    HackathonRole(Set<Permission> permissions) {
+    ContextRole(Set<Permission> permissions) {
         this.permissions = permissions;
     }
 

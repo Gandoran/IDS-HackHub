@@ -21,12 +21,18 @@ public class InProgress implements HackathonState {
     }
 
     /**
-     * Automatic transition:
-     * InProgress -> Evaluation when now >= schedule.endDate
+     * Advances the hackathon to the {@link HackathonStatus#EVALUATION} phase once the submission deadline has passed.
+     * <p>
+     * This transition is time-driven: if the hackathon schedule (or its end date) is missing, or the current time is still
+     * before the end date, the state is not changed.
+     * <p>
+     * When the deadline is reached, teams without a submission are removed. If no submitted teams remain after the cleanup,
+     * the hackathon cannot enter evaluation and an exception is thrown.
      *
-     * Fail-fast: if transition time arrives but there are no submissions,
-     * throws IllegalStateException.
+     * @param context the hackathon whose state may be updated
+     * @throws IllegalStateException if the deadline has passed but no submissions were posted
      */
+
     @Override
     public void updateState(Hackathon context) {
         Schedule schedule = context.getSchedule();

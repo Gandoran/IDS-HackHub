@@ -1,6 +1,8 @@
 package unicam.it.idshackhub.model.hackathon;
 
+import jakarta.persistence.Embeddable;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -13,8 +15,9 @@ import java.time.LocalDateTime;
  * follow a logical consistency upon instantiation.
  * </p>
  */
-@Getter
-@Setter
+@Embeddable
+@Getter @Setter
+@NoArgsConstructor
 public class Schedule {
 
     /**

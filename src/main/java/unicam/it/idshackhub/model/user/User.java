@@ -1,6 +1,8 @@
 package unicam.it.idshackhub.model.user;
 
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import unicam.it.idshackhub.model.team.Team;
 import unicam.it.idshackhub.model.user.assignment.Assignment;
@@ -23,13 +25,17 @@ import java.util.Optional;
  * </ul>
  * </p>
  */
+@Entity
+@Table(name = "app_user") // "user" è parola riservata in SQL
 @Getter
 @Setter
+@NoArgsConstructor
 public class User {
 
     /**
      * Unique identifier for the user.
      */
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     /**
@@ -50,16 +56,19 @@ public class User {
     /**
      * The global role assigned to the user, determining platform-wide privileges.
      */
+    @Enumerated(EnumType.STRING)
     private GlobalRole globalRole;
 
     /**
      * A list of contextual assignments linking the user to specific Teams or Hackathons with specific roles.
      */
-    private List<Assignment> assignments;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Assignment> assignments = new ArrayList<>();
 
     /**
      * The reference to the permanent Main Team this user belongs to (if any).
      */
+    @OneToOne @JoinColumn(name = "main_team_id")
     private Team userTeam;
 
     /**
@@ -108,5 +117,10 @@ public class User {
                 .map(Assignment::getContext)
                 .map(Context.class::cast)
                 .findFirst();
+    }
+
+    public void addAssignment(Assignment assignment) {
+        assignments.add(assignment);
+        assignment.setUser(this);
     }
 }

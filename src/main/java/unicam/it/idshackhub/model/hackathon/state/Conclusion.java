@@ -3,6 +3,13 @@ package unicam.it.idshackhub.model.hackathon.state;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
 import unicam.it.idshackhub.model.user.role.permission.Permission;
 
+/**
+ * Final phase of a hackathon lifecycle.
+ * <p>
+ * In this phase the winner can be proclaimed and no automatic transitions occur.
+ * </p>
+ */
+
 public class Conclusion implements HackathonState {
 
     @Override

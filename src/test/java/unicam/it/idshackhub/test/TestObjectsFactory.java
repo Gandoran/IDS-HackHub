@@ -8,10 +8,7 @@ import unicam.it.idshackhub.model.team.builder.TeamBuilder;
 import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.assignment.Assignment;
 import unicam.it.idshackhub.model.user.assignment.BaseContext;
-import unicam.it.idshackhub.model.user.role.GlobalRole;
-import unicam.it.idshackhub.model.user.role.HackathonRole;
-import unicam.it.idshackhub.model.user.role.Role;
-import unicam.it.idshackhub.model.user.role.TeamRole;
+import unicam.it.idshackhub.model.user.role.*;
 import unicam.it.idshackhub.model.utils.Request;
 
 import java.time.LocalDateTime;
@@ -47,7 +44,7 @@ public class TestObjectsFactory {
                 .getResult();
         team.setId(id);
 
-        AddAssignment(leader, team, TeamRole.T_TeamLeader);
+        AddAssignment(leader, team, ContextRole.T_TeamLeader);
         leader.setUserTeam(team);
 
         return team;
@@ -75,9 +72,9 @@ public class TestObjectsFactory {
             }
 
             for (User member : members) {
-                AddAssignment(member, hackathon, HackathonRole.H_HackathonTeamMember);
+                AddAssignment(member, hackathon, ContextRole.H_HackathonTeamMember);
             }
-            AddAssignment(leader, hackathon, HackathonRole.H_HackathonTeamLeader);
+            AddAssignment(leader, hackathon, ContextRole.H_HackathonTeamLeader);
         }
 
         return team;
@@ -105,7 +102,7 @@ public class TestObjectsFactory {
         h.setId(id);
         organizer.setGlobalRole(GlobalRole.G_VerifiedUser);
 
-        AddAssignment(organizer, h, HackathonRole.H_Organizer);
+        AddAssignment(organizer, h, ContextRole.H_Organizer);
 
         return h;
     }
@@ -122,12 +119,18 @@ public class TestObjectsFactory {
         return new Schedule(LocalDateTime.now(), LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), "Online");
     }
 
-    private static void AddAssignment(User user, BaseContext context, Role role) {
+    private static void AddAssignment(User user, BaseContext context, ContextRole role) {
+        // Attenzione: getRole() ora restituisce null nel codice di produzione se non implementiamo la conversione.
+        // Ma per i test, possiamo basarci sul confronto o sul fatto che Assignment.setRole popola roleName.
+
+        // Verifica semplificata per i test
         boolean alreadyAssigned = user.getAssignments().stream()
                 .anyMatch(a -> a.getContext().equals(context) && a.getRole().equals(role));
 
         if (!alreadyAssigned) {
-            user.getAssignments().add(new Assignment(context, role));
+            Assignment assignment = new Assignment(context, role);
+            assignment.setUser(user); // FONDAMENTALE per JPA e coerenza bidirezionale
+            user.getAssignments().add(assignment);
         }
     }
 }
