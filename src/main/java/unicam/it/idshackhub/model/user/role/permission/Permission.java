@@ -1,7 +1,7 @@
 package unicam.it.idshackhub.model.user.role.permission;
 
 /**
- * Enumerates all granular access rights available within the system.
+ * Lists all granular access rights available within the system.
  * <p>
  * This enum acts as the catalog of all possible actions a user might perform.
  * Permissions are not assigned directly to users; instead, they are grouped into
@@ -14,7 +14,7 @@ public enum Permission {
     /** Permission to register a permanent main team in the system. */
     Can_Create_Team,
     /** Permission to submit a formal request (e.g., for verification). */
-    Can_Create_Request,
+    Can_Create_Verified_Request,
     /** Permission to organize a new Hackathon event. */
     Can_Create_Hackathon,
     /** Permission to cast a vote on projects during a Hackathon. */
@@ -26,9 +26,9 @@ public enum Permission {
     /** Permission to register a sub-team to a specific Hackathon event. */
     Can_Register_Team,
     /** Permission to approve or reject user requests (Admin only). */
-    Can_Manage_Request,
+    Can_Manage_Verified_Request,
     /** Permission to declare the winners of a Hackathon. */
     Can_Proclamate_Winner,
     /** Permission to invite a user to become a Judge. */
-    Can_Invite_Judge;
+    Can_Invite_Judge
 }

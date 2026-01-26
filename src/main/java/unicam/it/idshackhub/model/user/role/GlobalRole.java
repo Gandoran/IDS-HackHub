@@ -24,12 +24,12 @@ public enum GlobalRole implements Role {
     /**
      * The platform administrator. Can manage user requests and system settings.
      */
-    G_SystemAdmin(EnumSet.of(Permission.Can_Manage_Request)),
+    G_SystemAdmin(EnumSet.of(Permission.Can_Manage_Verified_Request)),
 
     /**
      * The default role for a newly registered user. Limited basic permissions.
      */
-    G_NormalUser(EnumSet.of(Permission.Can_Create_Request, Permission.Can_Create_Team));
+    G_NormalUser(EnumSet.of(Permission.Can_Create_Verified_Request, Permission.Can_Create_Team));
 
     /**
      * The set of permissions associated with this role.

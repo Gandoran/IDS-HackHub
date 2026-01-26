@@ -1,4 +1,4 @@
-package unicam.it.idshackhub.model.service;
+package unicam.it.idshackhub.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,6 @@ import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.role.ContextRole;
 import unicam.it.idshackhub.repository.HackathonTeamRepository;
 import unicam.it.idshackhub.repository.UserRepository;
-import unicam.it.idshackhub.service.TeamService;
 import unicam.it.idshackhub.test.TestObjectsFactory;
 
 import java.util.ArrayList;

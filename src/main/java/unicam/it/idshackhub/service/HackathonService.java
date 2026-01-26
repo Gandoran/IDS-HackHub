@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
 import unicam.it.idshackhub.model.hackathon.state.HackathonStatus;
 import unicam.it.idshackhub.repository.HackathonRepository;
-import unicam.it.idshackhub.repository.UserRepository;
 
 import java.util.List;
 

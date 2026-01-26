@@ -9,7 +9,6 @@ import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.assignment.Assignment;
 import unicam.it.idshackhub.model.user.assignment.BaseContext;
 import unicam.it.idshackhub.model.user.role.*;
-import unicam.it.idshackhub.model.utils.Request;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -105,10 +104,6 @@ public class TestObjectsFactory {
         AddAssignment(organizer, h, ContextRole.H_Organizer);
 
         return h;
-    }
-
-    public static Request createRequest(Long id, User user, String description) {
-        return new Request(id, user, description);
     }
 
     public static TeamRules createTeamRules() {

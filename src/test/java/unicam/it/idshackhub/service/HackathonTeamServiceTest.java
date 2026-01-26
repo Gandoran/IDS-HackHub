@@ -1,4 +1,4 @@
-package unicam.it.idshackhub.model.service;
+package unicam.it.idshackhub.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,6 @@ import unicam.it.idshackhub.model.user.assignment.Assignment;
 import unicam.it.idshackhub.model.user.role.ContextRole;
 import unicam.it.idshackhub.model.utils.Submission;
 import unicam.it.idshackhub.repository.SubmissionRepository;
-import unicam.it.idshackhub.service.HackathonTeamService;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;

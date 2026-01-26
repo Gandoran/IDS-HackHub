@@ -1,4 +1,4 @@
-package unicam.it.idshackhub.model.service;
+package unicam.it.idshackhub.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,10 +13,8 @@ import unicam.it.idshackhub.model.team.Team;
 import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.role.ContextRole;
 import unicam.it.idshackhub.repository.HackathonRepository;
-import unicam.it.idshackhub.repository.RequestRepository;
 import unicam.it.idshackhub.repository.TeamRepository;
 import unicam.it.idshackhub.repository.UserRepository;
-import unicam.it.idshackhub.service.SystemService;
 import unicam.it.idshackhub.test.TestObjectsFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,7 +25,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class) // Necessario per Mockito
 class SystemServiceTest {
 
-    @Mock private RequestRepository requestRepository;
     @Mock private UserRepository userRepository;
     @Mock private HackathonRepository hackathonRepository;
     @Mock private TeamRepository teamRepository;
