@@ -34,14 +34,6 @@ public class SystemService {
     private final HackathonRepository hackathonRepository;
     private final TeamRepository teamRepository;
 
-    /**
-     * Creates the service.
-     *
-     * @param userRepository repository used to persist user assignments.
-     * @param hackathonRepository repository used to persist created Hackathons.
-     * @param teamRepository repository used to persist created Teams.
-     */
-
     @Autowired
     public SystemService(UserRepository userRepository,
                          HackathonRepository hackathonRepository,

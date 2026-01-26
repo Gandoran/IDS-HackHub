@@ -26,13 +26,6 @@ public class JudgeService {
     private final SubmissionRepository submissionRepository;
     private final HackathonRepository hackathonRepository;
 
-    /**
-     * Creates the service.
-     *
-     * @param submissionRepository the repository used to persist submissions and votes.
-     * @param hackathonRepository the repository used to persist Hackathon state transitions.
-     */
-
     @Autowired
     public JudgeService(SubmissionRepository submissionRepository, HackathonRepository hackathonRepository) {
         this.submissionRepository = submissionRepository;
@@ -49,7 +42,6 @@ public class JudgeService {
      * @return the stored vote value.
      * @throws RuntimeException if the judge lacks permission or the Hackathon is not in the evaluation state.
      */
-
     public Integer judgeSubmission(User judge, Submission submission, Hackathon hackathon, int vote) {
         if (!checkPermission(judge, Permission.Can_Vote, hackathon)) {
             throw new RuntimeException("Permission denied");
@@ -61,6 +53,7 @@ public class JudgeService {
         submissionRepository.save(submission);
         return submission.getVote();
     }
+
     /**
      * Ends the evaluation phase for the given Hackathon.
      * <p>
@@ -73,7 +66,6 @@ public class JudgeService {
      * @return the new {@link unicam.it.idshackhub.model.hackathon.state.HackathonStatus} of the Hackathon.
      * @throws RuntimeException if the judge lacks permission or some submission has not been voted yet.
      */
-
     public HackathonStatus closeEvaluationState(User judge, Hackathon hackathon) {
         if (!checkPermission(judge, Permission.Can_End_Evaluation_State, hackathon)) {
             throw new RuntimeException("Permission denied");

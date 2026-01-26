@@ -1,5 +1,6 @@
 package unicam.it.idshackhub.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.role.permission.Permission;
@@ -23,13 +24,7 @@ public class RequestService {
     private final UserRepository userRepository;
     private final RequestRepository requestRepository;
 
-    /**
-     * Creates the service.
-     *
-     * @param userRepository repository used to persist user updates triggered by request management.
-     * @param requestRepository repository used to persist and delete requests.
-     */
-
+    @Autowired
     public RequestService(UserRepository userRepository, RequestRepository requestRepository) {
         this.userRepository = userRepository;
         this.requestRepository = requestRepository;
@@ -43,7 +38,6 @@ public class RequestService {
      * @return the persisted request.
      * @throws RuntimeException if the user does not have {@link unicam.it.idshackhub.model.user.role.permission.Permission#Can_Create_Request}.
      */
-
     public Request createRequest(User user, String description) {
         if (!checkPermission(user, Permission.Can_Create_Request)) {
             throw new RuntimeException("Permission denied");
@@ -63,7 +57,6 @@ public class RequestService {
      * @return the decision applied ({@code true} if accepted; {@code false} otherwise).
      * @throws RuntimeException if the administrator does not have {@link unicam.it.idshackhub.model.user.role.permission.Permission#Can_Manage_Request}.
      */
-
     public boolean manageRequest(User admin, Request request, boolean manage) {
         if (!checkPermission(admin, Permission.Can_Manage_Request)) {
             throw new RuntimeException("Permission denied");

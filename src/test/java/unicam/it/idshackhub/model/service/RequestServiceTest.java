@@ -17,8 +17,7 @@ import unicam.it.idshackhub.test.TestObjectsFactory;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class RequestServiceTest {
@@ -62,34 +61,35 @@ public class RequestServiceTest {
 
     @Test
     void manageRequest_Success() {
-        // Simuliamo il salvataggio
-        when(requestRepository.save(any(Request.class))).thenReturn(requestMemberUser);
-        when(userRepository.save(any(User.class))).thenReturn(memberUser);
-
+        // Setup: ci assicuriamo che il ruolo iniziale sia diverso
         assertNotEquals(GlobalRole.G_VerifiedUser, memberUser.getGlobalRole());
 
+        // Eseguiamo l'azione
         boolean result = requestService.manageRequest(sysAdmin, requestMemberUser, true);
 
+        // Verifiche
         assertTrue(result);
-        assertEquals(GlobalRole.G_VerifiedUser, memberUser.getGlobalRole(),
-                "User should be promoted to VerifiedUser after request approval");
+        assertEquals(GlobalRole.G_VerifiedUser, memberUser.getGlobalRole());
 
-        verify(requestRepository).save(requestMemberUser);
+        // VERIFICA: La request viene eliminata, non salvata
+        verify(requestRepository).delete(requestMemberUser);
+        verify(requestRepository, never()).save(any(Request.class));
+
+        // VERIFICA: L'utente viene salvato (per rendere persistente il cambio ruolo)
         verify(userRepository).save(memberUser);
     }
 
     @Test
     void manageRequest_Failure_RequestDenied() {
-        // In caso di rifiuto, salviamo comunque la request aggiornata (stato denied?) ma non serve salvare l'user
-        when(requestRepository.save(any(Request.class))).thenReturn(requestMemberUser);
-
+        // Eseguiamo l'azione con manage = false
         boolean result = requestService.manageRequest(sysAdmin, requestMemberUser, false);
-
+        // Verifiche
         assertFalse(result);
+        // Il ruolo non deve essere G_VerifiedUser
         assertNotEquals(GlobalRole.G_VerifiedUser, memberUser.getGlobalRole());
-
-        verify(requestRepository).save(requestMemberUser);
-        // UserRepository.save NON dovrebbe essere chiamato qui per promuovere l'utente
-        verify(userRepository).save(any(User.class));
+        // VERIFICA: Anche in caso di rifiuto, la richiesta viene eliminata
+        verify(requestRepository).delete(requestMemberUser);
+        // VERIFICA: Secondo il tuo codice, l'utente viene salvato comunque
+        verify(userRepository).save(memberUser);
     }
 }

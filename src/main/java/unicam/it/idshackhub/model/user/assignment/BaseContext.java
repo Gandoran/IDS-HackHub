@@ -14,7 +14,7 @@ import lombok.Setter;
  * </p>
  */
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED) // Crea una tabella base_context e unisce le tabelle figlie tramite ID
+@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "base_context")
 @Getter
 @Setter

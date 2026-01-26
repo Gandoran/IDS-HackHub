@@ -7,6 +7,14 @@ import lombok.Setter;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
 import unicam.it.idshackhub.model.team.HackathonTeam;
 
+/**
+ * Represents a project or work submitted by a team for a specific hackathon.
+ * <p>
+ * This entity stores the submission details, including the project description,
+ * the assigned score (vote), and the links to the participating team and
+ * the parent hackathon.
+ * </p>
+ */
 @Entity
 @Getter @Setter @NoArgsConstructor
 public class Submission {
@@ -21,7 +29,7 @@ public class Submission {
     private HackathonTeam team;
 
     @ManyToOne @JoinColumn(name = "hackathon_id")
-    private Hackathon hackathon; // Necessario per la List<Submission> in Hackathon
+    private Hackathon hackathon;
 
     public Submission(String description, HackathonTeam team) {
         this.description = description;

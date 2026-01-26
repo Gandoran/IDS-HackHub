@@ -17,14 +17,13 @@ import java.util.List;
  * Hackathons whose status can advance automatically according to their schedule.
  * </p>
  */
-
 @Service
 public class HackathonService {
 
     private final HackathonRepository hackathonRepository;
 
     @Autowired
-    public HackathonService(HackathonRepository hackathonRepository, UserRepository userRepository) {
+    public HackathonService(HackathonRepository hackathonRepository) {
         this.hackathonRepository = hackathonRepository;
     }
 
@@ -36,7 +35,6 @@ public class HackathonService {
      * transition occurred.
      * </p>
      */
-
     @Transactional
     public void updateAllStates() {
         List<Hackathon> autoManagedHackathons = hackathonRepository.findHackathonsForScheduler();

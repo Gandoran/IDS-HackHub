@@ -5,10 +5,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@EnableScheduling // Fa partire lo scheduler!
+@EnableScheduling
 public class IdsHackHubApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(IdsHackHubApplication.class, args);
     }
+
 }

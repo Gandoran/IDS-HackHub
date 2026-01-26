@@ -40,19 +40,19 @@ public class Hackathon extends BaseContext {
     /**
      * The set of rules governing team composition and limits for this Hackathon.
      */
-    @Embedded // I campi di TeamRules finiscono nella tabella hackathon
+    @Embedded
     private TeamRules rules;
 
     /**
      * The group of users responsible for managing and judging the event.
      */
-    @Embedded // I campi di HackathonStaff finiscono nella tabella hackathon
+    @Embedded
     private HackathonStaff staff;
 
     /**
      * The time window and location details for the event.
      */
-    @Embedded // I campi di Schedule finiscono nella tabella hackathon
+    @Embedded
     private Schedule schedule;
 
     /**
@@ -80,6 +80,9 @@ public class Hackathon extends BaseContext {
         return Objects.requireNonNull(HackathonStateFactory.getBehavior(this.status)).isActionAllowed(perm);
     }
 
+    /**
+     * Gets the Hackathon's state and updates it.
+     */
     public void updateState() {
         HackathonState state = HackathonStateFactory.getBehavior(this.status);
         if (state != null) {

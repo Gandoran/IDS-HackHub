@@ -24,12 +24,6 @@ public class HackathonTeamService {
 
     private final SubmissionRepository submissionRepository;
 
-    /**
-     * Creates the service.
-     *
-     * @param submissionRepository the repository used to persist {@link unicam.it.idshackhub.model.utils.Submission} instances.
-     */
-
     @Autowired
     public HackathonTeamService(SubmissionRepository submissionRepository) {
         this.submissionRepository = submissionRepository;
@@ -51,7 +45,6 @@ public class HackathonTeamService {
      * @return the persisted {@link unicam.it.idshackhub.model.utils.Submission}.
      * @throws RuntimeException if the user does not have the required permission.
      */
-
     public Submission postSubmission(User hackathonTeamLeader, String description, HackathonTeam team, Hackathon hackathon) {
         if (!checkPermission(hackathonTeamLeader, Permission.Can_Submit, team)) {
             throw new RuntimeException("Permission denied");

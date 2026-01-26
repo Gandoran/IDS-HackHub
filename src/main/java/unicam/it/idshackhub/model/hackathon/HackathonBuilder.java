@@ -1,10 +1,7 @@
 package unicam.it.idshackhub.model.hackathon;
 
-import unicam.it.idshackhub.model.team.HackathonTeam;
 import unicam.it.idshackhub.model.user.User;
-
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Builder class for creating instances of {@link Hackathon}.

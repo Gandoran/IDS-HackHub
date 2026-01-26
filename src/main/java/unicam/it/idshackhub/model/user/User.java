@@ -26,7 +26,7 @@ import java.util.Optional;
  * </p>
  */
 @Entity
-@Table(name = "app_user") // "user" è parola riservata in SQL
+@Table(name = "app_user")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -119,6 +119,15 @@ public class User {
                 .findFirst();
     }
 
+    /**
+     * Adds a contextual assignment to the user and ensures the bidirectional relationship is maintained.
+     * <p>
+     * This method links the provided {@link Assignment} to this user instance and
+     * simultaneously sets this user as the owner of the assignment.
+     * </p>
+     *
+     * @param assignment the new assignment (role within a context) to be associated with this user.
+     */
     public void addAssignment(Assignment assignment) {
         assignments.add(assignment);
         assignment.setUser(this);

@@ -17,7 +17,7 @@ public interface HackathonRepository extends JpaRepository<Hackathon, Long> {
     /**
      * Returns hackathons that require automatic time-based monitoring.
      * <p>
-     * In this project, only hackathons in {@code REGISTRATION} or {@code IN_PROGRESS} are monitored by the scheduler.
+     * only hackathons in {@code REGISTRATION} or {@code IN_PROGRESS} are monitored by the scheduler.
      *
      * @return hackathons that are currently in {@code REGISTRATION} or {@code IN_PROGRESS}
      */
