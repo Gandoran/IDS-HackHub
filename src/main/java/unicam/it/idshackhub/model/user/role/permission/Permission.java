@@ -30,5 +30,6 @@ public enum Permission {
     /** Permission to declare the winners of a Hackathon. */
     Can_Proclamate_Winner,
     /** Permission to invite a user to become a Judge. */
-    Can_Invite_Judge
+    Can_Invite_Judge,
+    Can_Send_Email;
 }
