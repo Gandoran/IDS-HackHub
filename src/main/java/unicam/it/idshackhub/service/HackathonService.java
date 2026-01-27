@@ -1,6 +1,5 @@
 package unicam.it.idshackhub.service;
 
-import jakarta.transaction.TransactionScoped;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,6 +9,7 @@ import unicam.it.idshackhub.model.team.HackathonTeam;
 import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.role.permission.Permission;
 import unicam.it.idshackhub.repository.HackathonRepository;
+import unicam.it.idshackhub.repository.SubmissionRepository;
 
 import java.util.List;
 
@@ -26,12 +26,12 @@ import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
 public class HackathonService {
 
     private final HackathonRepository hackathonRepository;
-    private final PayPalService payPalService;
+    private final SubmissionRepository submissionRepository;
 
     @Autowired
-    public HackathonService(HackathonRepository hackathonRepository,PayPalService payPalService) {
-        this.payPalService = payPalService;
+    public HackathonService(HackathonRepository hackathonRepository, SubmissionRepository submissionRepository) {
         this.hackathonRepository = hackathonRepository;
+        this.submissionRepository = submissionRepository;
     }
 
     /**
@@ -44,7 +44,7 @@ public class HackathonService {
      */
     @Transactional
     public void updateAllStates() {
-        List<Hackathon> autoManagedHackathons = hackathonRepository.findHackathonsForScheduler();
+        List<Hackathon> autoManagedHackathons = hackathonRepository.findActiveHackathonsForScheduler();
         for (Hackathon h : autoManagedHackathons) {
             HackathonStatus oldState = h.getStatus();
             h.updateState();
@@ -56,12 +56,22 @@ public class HackathonService {
     }
 
     @Transactional
-    public void SendPrizeToWinner(User organzier, HackathonTeam winnerTeam){
-        if(!checkPermission(organzier, Permission.Can_Proclamate_Winner)){
-            throw new RuntimeException("You do not have permission to proclamate winner");
+    public void proclamateWinner(User organizer, Hackathon hackathon) {
+        if (!checkPermission(organizer, Permission.Can_Proclamate_Winner, hackathon)) {
+            throw new RuntimeException("Permission denied");
         }
-        String winnerEmail = winnerTeam.getMainTeam().getPayPalAccount();
-        Double prize = winnerTeam.getHackathonParticipation().getPrize();
-        String approvalUrl = payPalService.initiatePayment(prize, winnerEmail);
+        if (!hackathon.isActionAllowed(Permission.Can_Proclamate_Winner)) {
+            throw new RuntimeException("Hackathon not in the correct state");
+        }
+
+        HackathonTeam teams = submissionRepository.findWinner(hackathon.getId());
+
+        // TODO Invio soldi
+
+        hackathon.setStatus(HackathonStatus.ARCHIVED);
+        hackathonRepository.save(hackathon);
     }
+
+
+
 }

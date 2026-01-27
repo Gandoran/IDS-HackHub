@@ -1,12 +1,13 @@
 package unicam.it.idshackhub.model.hackathon;
 
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import unicam.it.idshackhub.model.user.User;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents the administrative staff of a Hackathon.
@@ -27,11 +28,22 @@ public class HackathonStaff {
     private User organizer;
 
     /**
-     * The user responsible for evaluating projects (optional or assigned later).
+     * The user responsible for evaluating projects (assigned later).
      */
     @ManyToOne
     @JoinColumn(name = "judge_id")
     private User judge;
+
+    /**
+     * The list of users responsible for helping teams (assigned later).
+     */
+    @ManyToMany
+    @JoinTable(
+            name = "mentors_id",
+            joinColumns = @JoinColumn(name = "hackathon_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> mentors = new ArrayList<>();
 
     /**
      * Constructs a new HackathonStaff with a designated organizer.

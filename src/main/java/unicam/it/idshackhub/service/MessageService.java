@@ -7,8 +7,10 @@ import org.springframework.stereotype.Service;
 import unicam.it.idshackhub.model.message.ActionStatus;
 import unicam.it.idshackhub.model.message.Message;
 import unicam.it.idshackhub.model.message.MessageType;
-import unicam.it.idshackhub.model.message.strategy.MessageStrategy;
+import unicam.it.idshackhub.model.message.StaffInvite;
+import unicam.it.idshackhub.service.strategy.MessageStrategy;
 import unicam.it.idshackhub.model.user.User;
+import unicam.it.idshackhub.model.user.role.ContextRole;
 import unicam.it.idshackhub.model.user.role.permission.Permission;
 import unicam.it.idshackhub.repository.MessageRepository;
 
@@ -61,6 +63,33 @@ public class MessageService {
     }
 
     /**
+     * Sends a new Staff invite message to a recipient.
+     * Validates the sender and message type before saving the message.
+     *
+     * @param sender
+     * @param recipient
+     * @param type
+     * @param content
+     * @param referenceId
+     */
+    @Transactional
+    public void sendStaffInvite(User sender, User recipient, MessageType type, String content, Long referenceId, ContextRole role) {
+        StaffInvite message = new StaffInvite(
+                sender,
+                recipient,
+                content,
+                type,
+                ActionStatus.PENDING,
+                referenceId,
+                role
+        );
+        validateMessageStatus(message);
+        validateSender(message, sender);
+        validateRecipient(message, recipient);
+        messageRepository.save(message);
+    }
+
+    /**
      * Processes a reply to a message.
      * Validates the message status and recipient before executing the reply logic.
      *
@@ -74,16 +103,12 @@ public class MessageService {
                 .orElseThrow(() -> new EntityNotFoundException("Message not found: " + messageId + "."));
         validateMessageStatus(message);
         validateRecipient(message, currentUser);
-
         MessageStrategy strategy = strategyMap.get(message.getType());
-
         if (strategy == null) {
             throw new IllegalStateException("Strategy not found for message type: " + message.getType() + ".");}
-
         if (accepted)
         {strategy.executeAccept(message);}
         else {strategy.executeReject(message);}
-
         messageRepository.save(message);
     }
 
@@ -96,6 +121,7 @@ public class MessageService {
         if (!recipient.equals(message.getRecipient())) {
             throw new RuntimeException("Permission denied");
         }
+        // TODO Recipient non deve già far parte dell'hackathon
     }
 
     private void validateSender(Message message, User sender) {

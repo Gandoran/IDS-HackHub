@@ -16,7 +16,7 @@ public class Registration implements HackathonState {
     @Override
     public boolean isActionAllowed(Permission perm) {
         return switch (perm) {
-            case Can_Invite_Judge -> true;
+            case Can_Invite_Staff -> true;
             case Can_Register_Team -> true;
             default -> false;
         };
@@ -43,10 +43,12 @@ public class Registration implements HackathonState {
 
         if (LocalDateTime.now().isBefore(schedule.getStartDate())) return;
 
-        if (context.getStaff() == null || context.getStaff().getJudge() == null) {
-            throw new IllegalStateException("Cannot start hackathon: missing judge");
+        if (context.getStaff() == null ||
+                context.getStaff().getJudge() == null ||
+                context.getStaff().getMentors().isEmpty()) {
+            throw new IllegalStateException("Cannot start hackathon: missing judge or mentor");
         }
-        if (context.getTeams() == null || context.getTeams().size() < context.getRules().getMinTeams()) {
+        if (context.getTeams().isEmpty() || context.getTeams().size() < context.getRules().getMinTeams()) {
             throw new IllegalStateException("Cannot start hackathon: minimum number of teams not reached");
         }
         context.setStatus(HackathonStatus.IN_PROGRESS);

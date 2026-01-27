@@ -13,6 +13,7 @@ public class HackathonStateFactory {
     private static final HackathonState IN_PROGRESS = new InProgress();
     private static final HackathonState EVALUATION = new Evaluation();
     private static final HackathonState CONCLUSION = new Conclusion();
+    private static final HackathonState ARCHIVED = new Archived();
 
     /**
      * Returns the state behavior corresponding to the given status.
@@ -29,6 +30,7 @@ public class HackathonStateFactory {
             case IN_PROGRESS -> IN_PROGRESS;
             case EVALUATION -> EVALUATION;
             case CONCLUSION -> CONCLUSION;
+            case ARCHIVED ->  ARCHIVED;
         };
     }
 }

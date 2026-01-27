@@ -13,6 +13,7 @@ import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.role.GlobalRole;
 import unicam.it.idshackhub.repository.MessageRepository;
 import unicam.it.idshackhub.repository.UserRepository;
+import unicam.it.idshackhub.service.strategy.VerifyUserStrategy;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;

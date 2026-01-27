@@ -9,6 +9,8 @@ import unicam.it.idshackhub.model.user.role.permission.Permission;
 import unicam.it.idshackhub.model.utils.Submission;
 import unicam.it.idshackhub.repository.SubmissionRepository;
 
+import java.time.LocalDateTime;
+
 import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
 
 /**
@@ -52,11 +54,14 @@ public class HackathonTeamService {
         Submission submission = team.getSubmission();
         if(submission != null) {
             team.getSubmission().setDescription(description);
+            team.getSubmission().setSubmissionDate(LocalDateTime.now());
         }else{
             submission = new Submission(description,team);
             submission.setHackathon(hackathon);
+            submission.setSubmissionDate(LocalDateTime.now());
             team.setSubmission(submission);
             hackathon.getSubmissions().add(submission);
+
         }
         return submissionRepository.save(submission);
     }

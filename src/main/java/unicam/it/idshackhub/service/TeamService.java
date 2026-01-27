@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
+import unicam.it.idshackhub.model.hackathon.state.HackathonStatus;
 import unicam.it.idshackhub.model.team.HackathonTeam;
 import unicam.it.idshackhub.model.team.Team;
 import unicam.it.idshackhub.model.team.builder.HackathonTeamBuilder;
@@ -97,7 +98,10 @@ public class TeamService {
 
     private void validateHackathonPermissions(Hackathon hackathon) {
         if (!hackathon.isActionAllowed(Permission.Can_Register_Team)) {
-            throw new RuntimeException("Permission denied by hackathon");
+            throw new RuntimeException("Permission denied: cannot register team.");
+        }
+        if (hackathon.getStatus() != HackathonStatus.REGISTRATION) {
+            throw new RuntimeException("Hackathon not in the registration phase");
         }
     }
 

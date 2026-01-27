@@ -10,6 +10,7 @@ import unicam.it.idshackhub.model.message.Message;
 import unicam.it.idshackhub.model.message.MessageType;
 import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.repository.MessageRepository;
+import unicam.it.idshackhub.service.strategy.HelpRequestStrategy;
 
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;

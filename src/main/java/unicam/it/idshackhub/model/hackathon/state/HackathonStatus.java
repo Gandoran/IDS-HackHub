@@ -13,4 +13,5 @@ public enum HackathonStatus {
     IN_PROGRESS,
     EVALUATION,
     CONCLUSION,
+    ARCHIVED
 }

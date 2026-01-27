@@ -1,4 +1,4 @@
-package unicam.it.idshackhub.model.message.strategy;
+package unicam.it.idshackhub.service.strategy;
 
 import unicam.it.idshackhub.model.message.ActionStatus;
 import unicam.it.idshackhub.model.message.Message;

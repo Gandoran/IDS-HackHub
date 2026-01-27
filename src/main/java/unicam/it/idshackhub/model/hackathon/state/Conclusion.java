@@ -22,6 +22,7 @@ public class Conclusion implements HackathonState {
 
     @Override
     public void updateState(Hackathon context) {
-        // final state: no automatic transitions
+        //TODO CONTROLLO SE SONO STATI INVIATI SOLDI
+        context.setStatus(HackathonStatus.ARCHIVED);
     }
 }

@@ -29,7 +29,12 @@ public enum Permission {
     Can_Manage_Verified_Request,
     /** Permission to declare the winners of a Hackathon. */
     Can_Proclamate_Winner,
-    /** Permission to invite a user to become a Judge. */
-    Can_Invite_Judge,
-    Can_Send_Email;
+    /** Permission to invite a user to become a Judge or a Mentor. */
+    Can_Invite_Staff,
+    /** Permission to send emails to users. */
+    Can_Send_Email,
+    /** Permission to view submissions made by hackathon participants. */
+    Can_See_Submissions,
+    /** Permission to manage help requests. */
+    Can_Manage_Help_Request,
 }

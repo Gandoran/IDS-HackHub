@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import unicam.it.idshackhub.model.message.ActionStatus;
 import unicam.it.idshackhub.model.message.Message;
 import unicam.it.idshackhub.model.message.MessageType;
-import unicam.it.idshackhub.model.message.strategy.MessageStrategy;
+import unicam.it.idshackhub.service.strategy.MessageStrategy;
 import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.role.permission.Permission;
 import unicam.it.idshackhub.repository.MessageRepository;

@@ -23,13 +23,19 @@ public enum ContextRole implements Role {
      * A judge responsible for evaluating projects.
      * Has permissions to vote and end the evaluation phase.
      */
-    H_Judge(EnumSet.of(Permission.Can_Vote, Permission.Can_End_Evaluation_State)),
+    H_Judge(EnumSet.of(Permission.Can_Vote, Permission.Can_End_Evaluation_State, Permission.Can_See_Submissions)),
+
+    /**
+     * A mentor responsible for helping teams.
+     * Has permission to send emails and organize meetings.
+     */
+    H_Mentor(EnumSet.of(Permission.Can_Send_Email, Permission.Can_Manage_Help_Request, Permission.Can_See_Submissions)),
 
     /**
      * The event organizer.
-     * Has permissions to proclaim winners and invite judges.
+     * Has permission to proclaim winners and invite judges.
      */
-    H_Organizer(EnumSet.of(Permission.Can_Proclamate_Winner, Permission.Can_Invite_Judge)),
+    H_Organizer(EnumSet.of(Permission.Can_Proclamate_Winner, Permission.Can_Invite_Staff, Permission.Can_See_Submissions)),
 
     /**
      * A standard participant within a team.

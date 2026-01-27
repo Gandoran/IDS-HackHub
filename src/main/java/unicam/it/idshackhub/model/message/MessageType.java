@@ -6,14 +6,12 @@ package unicam.it.idshackhub.model.message;
 public enum MessageType {
     // Richieste Operative
     VERIFY_USER_REQUEST,      // Sostituisce la vecchia classe Request
-    INVITE_JUDGE_REQUEST,  // Un Organizer invita un Judge
-    INVITE_MENTOR_REQUEST,  // Un Organizer invita un Mentor
+    INVITE_STAFF_REQUEST,  // Un Organizer invita un Giudice o un Mentore
     HELP_REQUEST,           // Un TeamMember di un hackathon chiede aiuto ai Mentor
 
     // Risposte
     VERIFY_USER_RESPONSE,
-    INVITE_JUDGE_RESPONSE,
-    INVITE_MENTOR_RESPONSE,
+    INVITE_STAFF_RESPONSE,
     HELP_RESPONSE;
 
     /**
@@ -23,8 +21,7 @@ public enum MessageType {
     public MessageType getOpposite() {
         return switch (this) {
             case VERIFY_USER_REQUEST -> VERIFY_USER_RESPONSE;
-            case INVITE_JUDGE_REQUEST -> INVITE_JUDGE_RESPONSE;
-            case INVITE_MENTOR_REQUEST -> INVITE_MENTOR_RESPONSE;
+            case INVITE_STAFF_REQUEST -> INVITE_STAFF_RESPONSE;
             case HELP_REQUEST -> HELP_RESPONSE;
             default -> null;
         };

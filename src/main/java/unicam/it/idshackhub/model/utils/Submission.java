@@ -7,6 +7,8 @@ import lombok.Setter;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
 import unicam.it.idshackhub.model.team.HackathonTeam;
 
+import java.time.LocalDateTime;
+
 /**
  * Represents a project or work submitted by a team for a specific hackathon.
  * <p>
@@ -24,6 +26,7 @@ public class Submission {
 
     private String description;
     private Integer vote;
+    private LocalDateTime submissionDate;
 
     @OneToOne @JoinColumn(name = "team_id")
     private HackathonTeam team;
