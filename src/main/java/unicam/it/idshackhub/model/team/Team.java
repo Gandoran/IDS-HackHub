@@ -25,10 +25,9 @@ import java.util.Objects;
 public class Team extends AbstractTeam {
 
     /**
-     * The International Bank Account Number (IBAN) associated with the team
-     * for financial transactions or prize payouts.
+     * The PayPal account for the team
      */
-    private String iban;
+    private String payPalAccount;
 
     /**
      * A historical list of all Hackathon participations (sub-teams) created by this organization.

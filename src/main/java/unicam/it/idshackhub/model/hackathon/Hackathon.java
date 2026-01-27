@@ -38,6 +38,11 @@ public class Hackathon extends BaseContext {
     private String description;
 
     /**
+     * The prize for this hackathon
+     */
+    private Double prize;
+
+    /**
      * The set of rules governing team composition and limits for this Hackathon.
      */
     @Embedded

@@ -90,13 +90,13 @@ public class SystemService {
      * @param user the user creating the team.
      * @param name the team name.
      * @param description the team description.
-     * @param iban the team's IBAN.
+     * @param payPalEmail the team's email.
      * @return the persisted Team.
      * @throws RuntimeException if the user is already in a team or lacks permission.
      */
 
     @Transactional
-    public Team createTeam(User user, String name, String description, String iban) {
+    public Team createTeam(User user, String name, String description, String payPalEmail) {
         if (user.getUserTeam() != null) {
             throw new RuntimeException("User already in a team");
         }
@@ -108,7 +108,7 @@ public class SystemService {
                 .buildDescription(description)
                 .buildLeader(user)
                 .buildMembers(new ArrayList<>())
-                .buildIban(iban)
+                .buildPayPalAccount(payPalEmail)
                 .getResult();
         team = teamRepository.save(team);
         user.addAssignment(new Assignment(team,ContextRole.T_TeamLeader));

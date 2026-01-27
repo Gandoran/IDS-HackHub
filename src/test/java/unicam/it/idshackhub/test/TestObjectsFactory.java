@@ -39,7 +39,7 @@ public class TestObjectsFactory {
                 .buildDescription("Description for " + name)
                 .buildLeader(leader)
                 .buildMembers(new ArrayList<>())
-                .buildIban("IT" + name.toUpperCase() + "00000000000000000")
+                .buildPayPalAccount(name.toUpperCase() + "@gmail.com")
                 .getResult();
         team.setId(id);
 

@@ -16,6 +16,9 @@ target/
 #Env
 .env
 
+#Controller
+PaymentController.java
+
 ### IntelliJ IDEA ###
 .idea
 *.iws

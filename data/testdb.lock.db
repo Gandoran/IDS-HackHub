@@ -1,0 +1,6 @@
+#FileLock
+#Tue Jan 27 16:40:25 CET 2026
+hostName=10.0.20.0
+id=19c001cfc90264a213991fae7ecb3b9ca4cf9c7a5c1
+method=file
+server=10.0.20.0\:51712

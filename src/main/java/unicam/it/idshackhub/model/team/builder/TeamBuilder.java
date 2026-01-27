@@ -10,7 +10,7 @@ import java.util.List;
  * Concrete builder implementation for creating permanent {@link Team} entities.
  * <p>
  * This builder extends the abstract logic to include fields specific to a Main Team,
- * such as the IBAN code.
+ * such as the PayPal account .
  * </p>
  */
 public class TeamBuilder extends TeamBuilderAbstract<Team, TeamBuilder> {
@@ -23,13 +23,13 @@ public class TeamBuilder extends TeamBuilderAbstract<Team, TeamBuilder> {
     }
 
     /**
-     * Sets the IBAN (International Bank Account Number) for the team.
+     * Sets the PayPal email for the team.
      *
-     * @param iban the financial identifier string.
+     * @param email the financial identifier string.
      * @return the builder instance for method chaining.
      */
-    public TeamBuilder buildIban(String iban) {
-        team.setIban(iban);
+    public TeamBuilder buildPayPalAccount(String email) {
+        team.setPayPalAccount(email);
         return this;
     }
 
