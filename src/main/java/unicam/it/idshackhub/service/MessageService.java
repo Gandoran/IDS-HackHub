@@ -46,6 +46,7 @@ public class MessageService {
      * @param content
      * @param referenceId
      */
+    /*
     @Transactional
     public void sendMessage(User sender, User recipient, MessageType type, String content, Long referenceId) {
         Message message = new Message(
@@ -59,6 +60,28 @@ public class MessageService {
         validateMessageStatus(message);
         validateSender(message, sender);
         validateRecipient(message, recipient);
+        messageRepository.save(message);
+    }
+    */
+
+    public void sendMessage(User sender, User recipient, MessageType type, String content, Long referenceId) {
+        if (type == MessageType.VERIFY_USER_REQUEST && recipient != null) {
+            throw new IllegalArgumentException("Verification requests must not have a specific recipient.");
+        }
+        Message message = new Message(
+                sender,
+                recipient,
+                content,
+                type,
+                ActionStatus.PENDING,
+                referenceId
+        );
+        validateMessageStatus(message);
+        validateSender(message, sender);
+        if (recipient != null) {
+            validateRecipientMatch(message, recipient);
+        }
+
         messageRepository.save(message);
     }
 
@@ -112,26 +135,23 @@ public class MessageService {
         messageRepository.save(message);
     }
 
-    private void validateRecipient(Message message, User recipient) {
-        if (message.getType() == MessageType.VERIFY_USER_REQUEST) {
-            if (!PermissionChecker.checkPermission(recipient, Permission.Can_Manage_Verified_Request)) {
-                throw new RuntimeException("Permission denied");
+    private void validateRecipient(Message message, User currentUser) {
+        if (message.getRecipient() == null) {
+            if (message.getType() == MessageType.VERIFY_USER_REQUEST) {
+                if (!PermissionChecker.checkPermission(currentUser, Permission.Can_Manage_Verified_Request)) {
+                    throw new RuntimeException("Permission denied: Cannot manage verified requests.");
+                }
             }
+            return;
         }
-        if (!recipient.equals(message.getRecipient())) {
-            throw new RuntimeException("Permission denied");
+        if (!currentUser.equals(message.getRecipient())) {
+            throw new RuntimeException("Permission denied: Recipient mismatch.");
         }
-        // TODO Recipient non deve già far parte dell'hackathon
     }
 
     private void validateSender(Message message, User sender) {
-        if(message.getType() == MessageType.VERIFY_USER_REQUEST) {
-            if(!PermissionChecker.checkPermission(sender, Permission.Can_Create_Verified_Request)) {
-                throw new RuntimeException("Permission denied");
-            }
-        }
         if (!sender.equals(message.getSender())) {
-            throw new RuntimeException("Permission denied");
+            throw new RuntimeException("Permission denied: Sender mismatch.");
         }
     }
 
@@ -139,6 +159,12 @@ public class MessageService {
         if (message.getActionStatus() == ActionStatus.ACCEPTED ||
                 message.getActionStatus() == ActionStatus.REJECTED) {
             throw new IllegalStateException("Message already processed: " + message.getId() + ".");
+        }
+    }
+
+    private void validateRecipientMatch(Message message, User recipient) {
+        if (!recipient.equals(message.getRecipient())) {
+            throw new RuntimeException("Permission denied: Recipient mismatch.");
         }
     }
 }

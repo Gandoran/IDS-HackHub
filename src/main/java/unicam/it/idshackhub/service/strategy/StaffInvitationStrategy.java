@@ -31,26 +31,34 @@ public class StaffInvitationStrategy implements MessageStrategy {
     @Override
     @Transactional
     public void executeAccept(Message message) {
-        Long hackathonId = message.getReferenceId();
-        User newStaffMember = message.getRecipient();
-
         StaffInvite invite = (StaffInvite) message;
+
+        Long hackathonId = invite.getReferenceId();
+        User newStaffMember = invite.getRecipient();
         ContextRole role = invite.getRole();
-        Hackathon hackathon = hackathonRepository.findByIdRegistration(hackathonId)
+
+        Hackathon hackathon = hackathonRepository.findById(hackathonId)
                 .orElseThrow(() -> new RuntimeException("Hackathon not found"));
+
+        // Controllo che l'utente non si sia iscritto all'hackathon mentre l'invito è in pending
+        if (newStaffMember.getRoleByContext(hackathon).isPresent()) {
+            executeResponse(message, "Error: You are already involved in this Hackathon.", ActionStatus.REJECTED);
+            return;
+        }
+
         if(role == ContextRole.H_Judge){
             addJudge(hackathon, newStaffMember);
         }else if(role == ContextRole.H_Mentor){
             addMentor(hackathon, newStaffMember);
+        } else {
+            throw new IllegalStateException("Invalid role in invitation: " + role);
         }
         hackathonRepository.save(hackathon);
-        executeResponse(message, newStaffMember.getUsername() + " has been set as staff member.", ActionStatus.ACCEPTED);
-    }
+        executeResponse(message, "You are now a " + role.name() + " for " + hackathon.getTitle(), ActionStatus.ACCEPTED);    }
 
     @Override
     public void executeReject(Message message) {
-        executeResponse(message, "Sorry, your request was rejected.", ActionStatus.REJECTED);
-    }
+        executeResponse(message, "You declined the invitation.", ActionStatus.REJECTED);    }
 
     @Override
     public void executeResponse(Message original, String content, ActionStatus status) {

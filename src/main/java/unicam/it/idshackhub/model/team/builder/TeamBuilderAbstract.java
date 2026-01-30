@@ -23,50 +23,32 @@ public abstract class TeamBuilderAbstract<V extends AbstractTeam, T extends Team
      */
     protected V team;
 
-    /**
-     * {@inheritDoc}
-     */
     public abstract T reset();
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public T buildName(String name) {
         team.setName(name);
         return self();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public T buildDescription(String description) {
         team.setDescription(description);
         return self();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public T buildLeader(User leader) {
         team.setLeader(leader);
         return self();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public T buildMembers(List<User> members) {
         team.setMembers(members);
         return self();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public V getResult() {
         return team;

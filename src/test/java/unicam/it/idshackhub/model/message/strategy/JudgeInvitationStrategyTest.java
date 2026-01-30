@@ -16,6 +16,7 @@ import unicam.it.idshackhub.model.user.role.ContextRole;
 import unicam.it.idshackhub.repository.HackathonRepository;
 import unicam.it.idshackhub.repository.MessageRepository;
 import unicam.it.idshackhub.repository.UserRepository;
+import unicam.it.idshackhub.service.strategy.StaffInvitationStrategy;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -32,7 +33,7 @@ class JudgeInvitationStrategyTest {
     @Mock private MessageRepository messageRepository;
 
     @InjectMocks
-    private JudgeInvitationStrategy strategy;
+    private StaffInvitationStrategy strategy;
 
     private User organizer;
     private User newJudge;
@@ -58,7 +59,7 @@ class JudgeInvitationStrategyTest {
                 organizer,
                 newJudge,
                 "Please be our judge",
-                MessageType.INVITE_JUDGE_REQUEST,
+                MessageType.INVITE_STAFF_REQUEST,
                 ActionStatus.PENDING,
                 100L
         );
@@ -66,7 +67,7 @@ class JudgeInvitationStrategyTest {
 
     @Test
     void getSupportedType() {
-        assertEquals(MessageType.INVITE_JUDGE_REQUEST, strategy.getSupportedType());
+        assertEquals(MessageType.INVITE_STAFF_REQUEST, strategy.getSupportedType());
     }
 
     @Test
@@ -89,7 +90,7 @@ class JudgeInvitationStrategyTest {
         // 3. Verifica che sia stato inviato il messaggio di risposta
         verify(messageRepository).save(argThat(msg ->
                 msg.getRecipient().equals(organizer) &&
-                        msg.getType() == MessageType.INVITE_JUDGE_RESPONSE &&
+                        msg.getType() == MessageType.INVITE_STAFF_RESPONSE &&
                         msg.getActionStatus() == ActionStatus.ACCEPTED
         ));
     }
