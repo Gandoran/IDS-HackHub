@@ -79,6 +79,13 @@ public class Hackathon extends BaseContext {
     private HackathonStatus status = HackathonStatus.REGISTRATION;
 
     /**
+     * The winner Team of Hackathon
+     */
+    @OneToOne
+    @JoinColumn(name = "winner_team_id")
+    private HackathonTeam winner;
+
+    /**
      * Checks whether a permission is allowed in the current phase.
      */
     public boolean isActionAllowed(Permission perm) {

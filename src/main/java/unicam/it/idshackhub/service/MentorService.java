@@ -30,21 +30,21 @@ public class MentorService {
      * Can either accept or reject it.
      *
      */
-    public void manageRequest(User mentor, Hackathon hackathon, Message message, boolean accept) {
+    public Message manageRequest(User mentor, Hackathon hackathon, Message message, boolean accept) {
         if (!checkPermission(mentor, Permission.Can_Manage_Help_Request, hackathon)) {
             throw new RuntimeException("Permission denied");
         }
-        messageService.processReply(message.getId(), accept, mentor);
+        return messageService.processReply(message.getId(), accept, mentor);
     }
 
     /**
      * Sends an email to a given User containing an ICS file with the event details.
      *
      */
-    public void sendCallEmail(User mentor, ICalendarDetails event, Hackathon hackathon, User receiver) {
+    public boolean sendCallEmail(User mentor, ICalendarDetails event, Hackathon hackathon, User receiver) {
         if (!checkPermission(mentor, Permission.Can_Send_Email, hackathon)) {
             throw new RuntimeException("Permission denied");
         }
-        emailService.sendEmailWithCalendar(event, receiver);
+        return emailService.sendEmailWithCalendar(event, receiver);
     }
 }

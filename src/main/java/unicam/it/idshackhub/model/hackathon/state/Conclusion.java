@@ -22,6 +22,9 @@ public class Conclusion implements HackathonState {
 
     @Override
     public void updateState(Hackathon context) {
-        context.setStatus(HackathonStatus.ARCHIVED);
+        if(context.getWinner() != null) {
+            context.setStatus(HackathonStatus.ARCHIVED);
+        }
+        throw new RuntimeException("Winner not setted");
     }
 }

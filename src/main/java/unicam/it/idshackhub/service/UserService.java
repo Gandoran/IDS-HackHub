@@ -2,6 +2,7 @@ package unicam.it.idshackhub.service;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import unicam.it.idshackhub.model.message.Message;
 import unicam.it.idshackhub.model.message.MessageType;
 import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.role.permission.Permission;
@@ -28,10 +29,9 @@ public class UserService {
      *
      */
     @Transactional
-    public void sendVerifyRequest(User sender, String content) {
+    public Message sendVerifyRequest(User sender, String content) {
         validateUser(sender);
-        messageService.sendMessage(sender, null, MessageType.VERIFY_USER_REQUEST, content, sender.getId());
-
+        return messageService.sendMessage(sender, null, MessageType.VERIFY_USER_REQUEST, content, sender.getId());
     }
 
     private void validateUser(User user) {

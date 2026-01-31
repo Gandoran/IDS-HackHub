@@ -4,10 +4,10 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
+import unicam.it.idshackhub.model.message.Message;
 import unicam.it.idshackhub.model.message.MessageType;
 import unicam.it.idshackhub.model.team.HackathonTeam;
 import unicam.it.idshackhub.model.user.User;
-import unicam.it.idshackhub.model.user.role.ContextRole;
 import unicam.it.idshackhub.model.user.role.permission.Permission;
 import unicam.it.idshackhub.model.utils.Submission;
 import unicam.it.idshackhub.repository.SubmissionRepository;
@@ -75,7 +75,7 @@ public class HackathonTeamService {
     }
 
     @Transactional
-    public void requestHelp(User member, Hackathon hackathon, String problemDescription) {
+    public Message requestHelp(User member, Hackathon hackathon, String problemDescription) {
         if (member.getRoleByContext(hackathon).isEmpty()) {
             throw new RuntimeException("You are not participating in this Hackathon.");
         }
@@ -85,7 +85,7 @@ public class HackathonTeamService {
         if (!hackathon.isActionAllowed(Permission.Can_Create_Help_Request)) {
             throw new RuntimeException("Cannot send help request: Hackathon not in the correct state.");
         }
-        messageService.sendMessage(
+        return messageService.sendMessage(
                 member,
                 null,
                 MessageType.HELP_REQUEST,

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Spring Data repository for {@link Hackathon} entities.
@@ -23,19 +22,4 @@ public interface HackathonRepository extends JpaRepository<Hackathon, Long> {
      */
     @Query("SELECT h FROM Hackathon h WHERE h.status = 'REGISTRATION' OR h.status = 'IN_PROGRESS'")
     List<Hackathon> findActiveHackathonsForScheduler();
-
-    /**
-     * Returns all active hackathons (Status != ARCHIVED).
-     * @return List of Hackathon
-     */
-    @Query("SELECT h FROM Hackathon h WHERE h.status <> 'ARCHIVED'")
-    List<Hackathon> findAllActiveHackathons();
-
-    /**
-     * Returns all hackathons in REGISTRATION state.
-     * @return List of Hackathon
-     */
-    @Query("SELECT h FROM Hackathon h WHERE h.status = 'REGISTRATION' AND h.id = ?1")
-    Optional<Hackathon> findByIdRegistration(Long id);
-
 }

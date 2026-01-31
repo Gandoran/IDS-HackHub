@@ -41,7 +41,7 @@ public class EmailService {
      * needed to generate the calendar file.
      * @param receiver the user who will receive the invitation email.
      */
-    public void sendEmailWithCalendar(ICalendarDetails event, User receiver) {
+    public boolean sendEmailWithCalendar(ICalendarDetails event, User receiver) {
         CompletableFuture.runAsync(() -> {
             try {
                 byte[] icsData = ICalendarGenerator.generateIcsFile(event,receiver.getEmail());
@@ -58,6 +58,7 @@ public class EmailService {
                 System.err.println("Error during the sending " + e.getMessage());
             }
         });
+        return true;
     }
 
     private String buildEmailBody(ICalendarDetails event) {

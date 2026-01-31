@@ -57,8 +57,7 @@ public class PayPalService {
      * @throws RuntimeException if the capture process fails.
      */
     @Transactional
-    public void confirmPayment(String orderId){
-        boolean success = payPal.captureOrder(orderId);
-        if (!success) {throw new RuntimeException("Failed to capture PayPal order with ID: " + orderId);}
+    public boolean confirmPayment(String orderId){
+        return payPal.captureOrder(orderId);
     }
 }

@@ -73,20 +73,24 @@ public class HackathonService {
      *
      */
     @Transactional
-    public void proclaimWinner(User organizer, Hackathon hackathon) {
+    public HackathonTeam proclaimWinner(User organizer, Hackathon hackathon) {
         if (!checkPermission(organizer, Permission.Can_proclaim_Winner, hackathon)) {
             throw new RuntimeException("Permission denied");
         }
         if (!hackathon.isActionAllowed(Permission.Can_proclaim_Winner)) {
             throw new RuntimeException("Hackathon not in the correct state");
         }
-
         HackathonTeam winnerTeam = submissionRepository.findWinner(hackathon.getId());
-
-        String orderId = payPalService.initiatePayment(hackathon.getPrize(), winnerTeam.getMainTeam().getPayPalAccount());
-        payPalService.confirmPayment(orderId);
-
-        hackathon.updateState();
+        hackathon.setWinner(winnerTeam);
         hackathonRepository.save(hackathon);
+        try {
+            String orderId = payPalService.initiatePayment(hackathon.getPrize(), winnerTeam.getMainTeam().getPayPalAccount());
+            payPalService.confirmPayment(orderId);
+            hackathon.setStatus(HackathonStatus.ARCHIVED);
+            hackathonRepository.save(hackathon);
+        } catch (Exception e) {
+            throw new RuntimeException("Winner selected but Payment failed: " + e.getMessage());
+        }
+        return hackathon.getWinner();
     }
 }

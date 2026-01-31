@@ -48,7 +48,7 @@ public class MessageService {
      *
      */
     @Transactional
-    public void sendMessage(User sender, User recipient, MessageType type, String content, Long referenceId) {
+    public Message sendMessage(User sender, User recipient, MessageType type, String content, Long referenceId) {
         validateMessageConsistency(type, recipient);
         Message message = new Message(
                 sender,
@@ -59,6 +59,7 @@ public class MessageService {
                 referenceId
         );
         validateAndSave(message, sender);
+        return message;
     }
 
     /**
@@ -67,7 +68,7 @@ public class MessageService {
      *
      */
     @Transactional
-    public void sendStaffInvite(User sender, User recipient, MessageType type, String content, Long referenceId, ContextRole role) {
+    public Message sendStaffInvite(User sender, User recipient, MessageType type, String content, Long referenceId, ContextRole role) {
         if (recipient == null) throw new IllegalArgumentException("Staff invites require a recipient.");
         StaffInvite message = new StaffInvite(
                 sender,
@@ -79,6 +80,7 @@ public class MessageService {
                 role
         );
         validateAndSave(message, sender);
+        return message;
     }
 
 
@@ -88,7 +90,7 @@ public class MessageService {
      *
      */
     @Transactional
-    public void processReply(Long messageId, boolean accepted, User currentUser) {
+    public Message processReply(Long messageId, boolean accepted, User currentUser) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new EntityNotFoundException("Message not found: " + messageId));
 
@@ -105,8 +107,7 @@ public class MessageService {
         } else {
             strategy.executeReject(message);
         }
-
-        messageRepository.save(message);
+        return messageRepository.save(message);
     }
 
     // -- PRIVATE METHODS --

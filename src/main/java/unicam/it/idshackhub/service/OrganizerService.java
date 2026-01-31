@@ -3,6 +3,7 @@ package unicam.it.idshackhub.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
+import unicam.it.idshackhub.model.message.Message;
 import unicam.it.idshackhub.model.message.MessageType;
 import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.role.ContextRole;
@@ -31,7 +32,7 @@ public class OrganizerService {
      * Invites a normal user to join the Hackathon as a Judge or Mentor.
      *
      */
-    public void inviteStaff(User organizer, User recipient, Hackathon hackathon, ContextRole roleToAssign) {
+    public Message inviteStaff(User organizer, User recipient, Hackathon hackathon, ContextRole roleToAssign) {
         if (roleToAssign != ContextRole.H_Judge && roleToAssign != ContextRole.H_Organizer) {
             throw new IllegalArgumentException("Invalid role for invitation. Only Judge or Mentor allowed.");
         }
@@ -44,7 +45,7 @@ public class OrganizerService {
         if(recipient.getRoleByContext(hackathon).isPresent()) {
             throw new RuntimeException("The user " + recipient.getUsername() + " is already involved in this Hackathon.");
         }
-        messageService.sendStaffInvite(
+        return messageService.sendStaffInvite(
                 organizer,
                 recipient,
                 MessageType.INVITE_STAFF_REQUEST,
@@ -53,6 +54,4 @@ public class OrganizerService {
                 roleToAssign
         );
     }
-
-
 }
