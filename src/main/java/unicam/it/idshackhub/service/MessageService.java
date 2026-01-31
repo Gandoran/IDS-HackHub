@@ -104,8 +104,10 @@ public class MessageService {
 
         if (accepted) {
             strategy.executeAccept(message);
+            message.setActionStatus(ActionStatus.ACCEPTED);
         } else {
             strategy.executeReject(message);
+            message.setActionStatus(ActionStatus.REJECTED);
         }
         return messageRepository.save(message);
     }

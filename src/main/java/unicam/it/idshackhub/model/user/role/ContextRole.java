@@ -35,7 +35,7 @@ public enum ContextRole implements Role {
      * The event organizer.
      * Has permission to proclaim winners and invite judges.
      */
-    H_Organizer(EnumSet.of(Permission.Can_proclaim_Winner, Permission.Can_Invite_Staff, Permission.Can_See_Submissions)),
+    H_Organizer(EnumSet.of(Permission.Can_Proclaim_Winner, Permission.Can_Invite_Staff, Permission.Can_See_Submissions)),
 
     /**
      * A standard participant within a team.

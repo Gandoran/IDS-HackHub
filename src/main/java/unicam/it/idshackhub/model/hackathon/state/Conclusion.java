@@ -15,7 +15,7 @@ public class Conclusion implements HackathonState {
     @Override
     public boolean isActionAllowed(Permission perm) {
         return switch (perm) {
-            case Can_proclaim_Winner -> true;
+            case Can_Proclaim_Winner -> true;
             default -> false;
         };
     }

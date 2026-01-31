@@ -74,10 +74,10 @@ public class HackathonService {
      */
     @Transactional
     public HackathonTeam proclaimWinner(User organizer, Hackathon hackathon) {
-        if (!checkPermission(organizer, Permission.Can_proclaim_Winner, hackathon)) {
+        if (!checkPermission(organizer, Permission.Can_Proclaim_Winner, hackathon)) {
             throw new RuntimeException("Permission denied");
         }
-        if (!hackathon.isActionAllowed(Permission.Can_proclaim_Winner)) {
+        if (!hackathon.isActionAllowed(Permission.Can_Proclaim_Winner)) {
             throw new RuntimeException("Hackathon not in the correct state");
         }
         HackathonTeam winnerTeam = submissionRepository.findWinner(hackathon.getId());

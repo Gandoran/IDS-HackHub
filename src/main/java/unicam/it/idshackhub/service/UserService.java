@@ -34,6 +34,13 @@ public class UserService {
         return messageService.sendMessage(sender, null, MessageType.VERIFY_USER_REQUEST, content, sender.getId());
     }
 
+    /**
+     * Lets the user accept or decline Invites.
+     */
+    public Message manageInvites(Long messageId, User sender, boolean accept) {
+        return messageService.processReply(messageId, accept, sender);
+    }
+
     private void validateUser(User user) {
         if(!checkPermission(user, Permission.Can_Create_Verified_Request)) {
             throw new RuntimeException("Permission denied: Cannot send verification request.");

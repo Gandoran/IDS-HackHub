@@ -76,9 +76,6 @@ public class HackathonTeamService {
 
     @Transactional
     public Message requestHelp(User member, Hackathon hackathon, String problemDescription) {
-        if (member.getRoleByContext(hackathon).isEmpty()) {
-            throw new RuntimeException("You are not participating in this Hackathon.");
-        }
         if(!checkPermission(member, Permission.Can_Create_Help_Request, hackathon)){
             throw new RuntimeException("Permission Denied: You cannot send help request.");
         }
