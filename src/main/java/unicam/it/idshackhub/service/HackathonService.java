@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
 import unicam.it.idshackhub.model.hackathon.state.HackathonStatus;
 import unicam.it.idshackhub.model.team.HackathonTeam;
+import unicam.it.idshackhub.model.team.Team;
 import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.role.permission.Permission;
 import unicam.it.idshackhub.repository.HackathonRepository;
@@ -27,11 +28,13 @@ public class HackathonService {
 
     private final HackathonRepository hackathonRepository;
     private final SubmissionRepository submissionRepository;
+    private final PayPalService payPalService;
 
     @Autowired
-    public HackathonService(HackathonRepository hackathonRepository, SubmissionRepository submissionRepository) {
+    public HackathonService(HackathonRepository hackathonRepository, SubmissionRepository submissionRepository, PayPalService payPalService) {
         this.hackathonRepository = hackathonRepository;
         this.submissionRepository = submissionRepository;
+        this.payPalService = payPalService;
     }
 
     /**
@@ -63,15 +66,15 @@ public class HackathonService {
         if (!hackathon.isActionAllowed(Permission.Can_Proclamate_Winner)) {
             throw new RuntimeException("Hackathon not in the correct state");
         }
-
         HackathonTeam teams = submissionRepository.findWinner(hackathon.getId());
-
-        // TODO Invio soldi
-
+        SendMoneyToWinner(teams.getMainTeam(),hackathon.getPrize());
         hackathon.setStatus(HackathonStatus.ARCHIVED);
         hackathonRepository.save(hackathon);
     }
 
+    private void SendMoneyToWinner(Team winnerTeam,Double prize) {
+        payPalService.initiatePayment(prize,winnerTeam.getPayPalAccount());
+    }
 
 
 }

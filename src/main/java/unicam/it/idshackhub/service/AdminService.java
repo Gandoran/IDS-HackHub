@@ -48,7 +48,6 @@ public class AdminService {
         if (!checkPermission(admin, Permission.Can_Manage_Verified_Request)) {
             throw new RuntimeException("Permission denied: You are not an Admin.");
         }
-
         // Lascia la logica di business al MessageService
         messageService.processReply(messageId, accept, admin);
     }
