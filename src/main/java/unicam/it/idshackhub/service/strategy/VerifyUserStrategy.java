@@ -11,6 +11,10 @@ import unicam.it.idshackhub.model.user.role.GlobalRole;
 import unicam.it.idshackhub.repository.MessageRepository;
 import unicam.it.idshackhub.repository.UserRepository;
 
+/**
+ * Strategy for managing user verification requests.
+ * It elevates a standard user to the Verified User global role upon approval.
+ */
 @Component
 @RequiredArgsConstructor
 public class VerifyUserStrategy implements MessageStrategy {
@@ -23,6 +27,10 @@ public class VerifyUserStrategy implements MessageStrategy {
         return MessageType.VERIFY_USER_REQUEST;
     }
 
+    /**
+     * Processes the acceptance of a verification request.
+     * Updates the sender's global role to G_VerifiedUser and persists the change in the repository.
+     */
     @Override
     @Transactional
     public void executeAccept(Message message) {
@@ -34,11 +42,19 @@ public class VerifyUserStrategy implements MessageStrategy {
         executeResponse(message, "Your verification request was approved!", ActionStatus.ACCEPTED);
     }
 
+    /**
+     * Processes the rejection of a verification request.
+     * Sends a notification to the user stating that the request was not approved.
+     */
     @Override
     public void executeReject(Message message) {
         executeResponse(message, "Your request was rejected.", ActionStatus.REJECTED);
     }
 
+    /**
+     * Generates a feedback message for the user regarding their verification status.
+     * Persists the response in the message history.
+     */
     @Override
     public void executeResponse(Message original, String content, ActionStatus status) {
         Message response = new Message (

@@ -16,6 +16,7 @@ public class InProgress implements HackathonState {
     public boolean isActionAllowed(Permission perm) {
         return switch (perm) {
             case Can_Submit -> true;
+            case Can_Create_Help_Request -> true;
             default -> false;
         };
     }
@@ -47,7 +48,6 @@ public class InProgress implements HackathonState {
         if (context.getTeams() == null || context.getTeams().isEmpty()) {
             throw new IllegalStateException("Cannot move to evaluation: no submissions were posted");
         }
-
         context.setStatus(HackathonStatus.EVALUATION);
     }
 }

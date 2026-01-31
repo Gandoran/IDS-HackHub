@@ -28,7 +28,7 @@ public enum Permission {
     /** Permission to approve or reject user requests (Admin only). */
     Can_Manage_Verified_Request,
     /** Permission to declare the winners of a Hackathon. */
-    Can_Proclamate_Winner,
+    Can_proclaim_Winner,
     /** Permission to invite a user to become a Judge or a Mentor. */
     Can_Invite_Staff,
     /** Permission to send emails to users. */
@@ -37,4 +37,6 @@ public enum Permission {
     Can_See_Submissions,
     /** Permission to manage help requests. */
     Can_Manage_Help_Request,
+    /** Permission to create a new help request. */
+    Can_Create_Help_Request
 }

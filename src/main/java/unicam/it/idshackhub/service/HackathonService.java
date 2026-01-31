@@ -27,11 +27,13 @@ public class HackathonService {
 
     private final HackathonRepository hackathonRepository;
     private final SubmissionRepository submissionRepository;
+    private final PayPalService payPalService;
 
     @Autowired
-    public HackathonService(HackathonRepository hackathonRepository, SubmissionRepository submissionRepository) {
+    public HackathonService(HackathonRepository hackathonRepository, SubmissionRepository submissionRepository, PayPalService payPalService) {
         this.hackathonRepository = hackathonRepository;
         this.submissionRepository = submissionRepository;
+        this.payPalService = payPalService;
     }
 
     /**
@@ -47,31 +49,44 @@ public class HackathonService {
         List<Hackathon> autoManagedHackathons = hackathonRepository.findActiveHackathonsForScheduler();
         for (Hackathon h : autoManagedHackathons) {
             HackathonStatus oldState = h.getStatus();
-            h.updateState();
-            HackathonStatus newState = h.getStatus();
-            if (oldState != newState) {
+            try {
+                h.updateState();
+                if (oldState != h.getStatus()) {
+                    hackathonRepository.save(h);
+                }
+            } catch (IllegalStateException e) {
+                h.setStatus(HackathonStatus.ARCHIVED);
                 hackathonRepository.save(h);
+            } catch (Exception e) {
+                throw new RuntimeException("Error while updating the state");
             }
         }
     }
 
+    /**
+     * Proclaims the winner of a Hackathon.
+     * The winner is selected through the {@link SubmissionRepository}
+     * and the payment is processed through PayPal.
+     * <p>
+     *     The team with the best vote is declared the winner.
+     * </p>
+     *
+     */
     @Transactional
-    public void proclamateWinner(User organizer, Hackathon hackathon) {
-        if (!checkPermission(organizer, Permission.Can_Proclamate_Winner, hackathon)) {
+    public void proclaimWinner(User organizer, Hackathon hackathon) {
+        if (!checkPermission(organizer, Permission.Can_proclaim_Winner, hackathon)) {
             throw new RuntimeException("Permission denied");
         }
-        if (!hackathon.isActionAllowed(Permission.Can_Proclamate_Winner)) {
+        if (!hackathon.isActionAllowed(Permission.Can_proclaim_Winner)) {
             throw new RuntimeException("Hackathon not in the correct state");
         }
 
-        HackathonTeam teams = submissionRepository.findWinner(hackathon.getId());
+        HackathonTeam winnerTeam = submissionRepository.findWinner(hackathon.getId());
 
-        // TODO Invio soldi
+        String orderId = payPalService.initiatePayment(hackathon.getPrize(), winnerTeam.getMainTeam().getPayPalAccount());
+        payPalService.confirmPayment(orderId);
 
-        hackathon.setStatus(HackathonStatus.ARCHIVED);
+        hackathon.updateState();
         hackathonRepository.save(hackathon);
     }
-
-
-
 }

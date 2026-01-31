@@ -59,6 +59,17 @@ public class HackathonBuilder {
     }
 
     /**
+     * Sets the prize of the Hackathon.
+     *
+     * @param prize the prize of the event
+     * @return the builder instance for method chaining.
+     */
+    public HackathonBuilder buildPrize(Double prize){
+        this.hackathon.setPrize(prize);
+        return this;
+    }
+
+    /**
      * Sets the rules for team composition.
      *
      * @param rules the {@link TeamRules} object defining limits.

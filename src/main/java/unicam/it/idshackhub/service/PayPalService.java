@@ -5,24 +5,39 @@ import com.paypal.orders.Order;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import unicam.it.idshackhub.service.paypal.PayPal;
 import unicam.it.idshackhub.service.paypal.PayPalOrder;
 
+/**
+ * Provides operations related to PayPal payments.
+ * <p>
+ *     This service orchestrates the payment process by delegating the low-level
+ * </p>
+ */
 @Service
 public class PayPalService {
-    private final PayPalOrder payPalOrder;
+    private final PayPal payPal;
 
     /**
      * Constructs the service with an injected {@link PayPalOrder} component.
      *
-     * @param payPalOrder the component responsible for low-level PayPal API calls.
+     * @param payPal the component responsible for low-level PayPal API calls.
      */
     @Autowired
-    public PayPalService(PayPalOrder payPalOrder) {
-        this.payPalOrder = payPalOrder;
+    public PayPalService(PayPal payPal) {
+        this.payPal = payPal;
     }
 
+    /**
+     * Initiates the payment process by creating a PayPal order.
+     * <p>
+     *     The winner's email address is passed as a parameter
+     *     to ensure that the payment is properly attributed to the
+     *     correct team.
+     * </p>
+     */
     public String initiatePayment(Double amount,String winnerEmail) {
-        Order order = payPalOrder.createOrder(amount.toString(),winnerEmail);
+        Order order = payPal.createOrder(amount.toString(),winnerEmail);
         if (order == null) throw new RuntimeException("Error during the payment process.");
         return order.links().stream()
                 .filter(link -> "approve".equals(link.rel()))
@@ -43,7 +58,7 @@ public class PayPalService {
      */
     @Transactional
     public void confirmPayment(String orderId){
-        boolean success = payPalOrder.captureOrder(orderId);
+        boolean success = payPal.captureOrder(orderId);
         if (!success) {throw new RuntimeException("Failed to capture PayPal order with ID: " + orderId);}
     }
 }

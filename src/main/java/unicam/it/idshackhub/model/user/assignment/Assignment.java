@@ -11,7 +11,7 @@ import unicam.it.idshackhub.model.user.role.*;
  * Represents a specific association between a Context and a Role.
  * <p>
  * This class is the core component of the context-aware permission system.
- * Instead of users having static roles (e.g., "Admin" everywhere), an {@link Assignment}
+ * Instead of users having static roles (e.g., "Organizer" everywhere), an {@link Assignment}
  * grants a user a specific {@link Role} (e.g., "Team Leader") only within a specific
  * {@link BaseContext} (e.g., "Team Alpha").
  * </p>

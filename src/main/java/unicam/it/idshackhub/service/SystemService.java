@@ -26,7 +26,6 @@ import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
  * global permissions. It also establishes the initial assignments/roles in the created contexts.
  * </p>
  */
-
 @Service
 public class SystemService {
 
@@ -61,7 +60,7 @@ public class SystemService {
      */
 
     @Transactional
-    public Hackathon createHackathon(User verifiedUser, String title, String description, TeamRules teamRules, Schedule schedule) {
+    public Hackathon createHackathon(User verifiedUser, String title, String description,Double prize, TeamRules teamRules, Schedule schedule) {
         if (!checkPermission(verifiedUser, Permission.Can_Create_Hackathon)) {
             throw new RuntimeException("Permission denied");
         }
@@ -69,6 +68,7 @@ public class SystemService {
         Hackathon hackathon = hackathonBuilder.reset()
                 .buildTitle(title)
                 .buildDescription(description)
+                .buildPrize(prize)
                 .buildRules(teamRules)
                 .buildSchedule(schedule)
                 .buildStaff(verifiedUser)

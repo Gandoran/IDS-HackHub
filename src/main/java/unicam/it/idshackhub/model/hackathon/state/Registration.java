@@ -35,7 +35,6 @@ public class Registration implements HackathonState {
      * @throws IllegalStateException if the hackathon is due to start but a judge is missing
      * @throws IllegalStateException if the hackathon is due to start but the minimum number of teams is not reached
      */
-
     @Override
     public void updateState(Hackathon context) {
         Schedule schedule = context.getSchedule();

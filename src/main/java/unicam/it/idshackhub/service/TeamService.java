@@ -27,7 +27,6 @@ import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
  * and assigning the appropriate roles to participants.
  * </p>
  */
-
 @Service
 public class TeamService {
 
@@ -39,8 +38,6 @@ public class TeamService {
         this.hackathonTeamRepository = hackathonTeamRepository;
         this.userRepository = userRepository;
     }
-
-    @Transactional
 
     /**
      * Registers a team to participate in a specific Hackathon.
@@ -65,6 +62,7 @@ public class TeamService {
      * @return the persisted {@link unicam.it.idshackhub.model.team.HackathonTeam}.
      * @throws RuntimeException if permissions or preconditions are not satisfied.
      */
+    @Transactional
     public HackathonTeam registerHackathonTeam(User teamLeader, String name, String description, User hackathonTeamLeader, List<User> members, Hackathon hackathon) {
         Team mainTeam = this.getMainTeam(teamLeader);
         validatePermissions(teamLeader, mainTeam);

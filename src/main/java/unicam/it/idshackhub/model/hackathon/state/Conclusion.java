@@ -15,14 +15,13 @@ public class Conclusion implements HackathonState {
     @Override
     public boolean isActionAllowed(Permission perm) {
         return switch (perm) {
-            case Can_Proclamate_Winner -> true;
+            case Can_proclaim_Winner -> true;
             default -> false;
         };
     }
 
     @Override
     public void updateState(Hackathon context) {
-        //TODO CONTROLLO SE SONO STATI INVIATI SOLDI
         context.setStatus(HackathonStatus.ARCHIVED);
     }
 }

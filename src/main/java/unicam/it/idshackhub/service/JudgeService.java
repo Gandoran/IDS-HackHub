@@ -19,7 +19,6 @@ import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
  * once all submissions have been voted.
  * </p>
  */
-
 @Service
 public class JudgeService {
 
@@ -33,7 +32,7 @@ public class JudgeService {
     }
 
     /**
-     * Assigns a vote to a submission within a Hackathon.
+     * Assigns a vote (0-10) to a submission within a Hackathon.
      *
      * @param judge the user performing the vote.
      * @param submission the submission to be judged.
@@ -69,6 +68,9 @@ public class JudgeService {
     public HackathonStatus closeEvaluationState(User judge, Hackathon hackathon) {
         if (!checkPermission(judge, Permission.Can_End_Evaluation_State, hackathon)) {
             throw new RuntimeException("Permission denied");
+        }
+        if(!hackathon.isActionAllowed(Permission.Can_End_Evaluation_State)) {
+            throw new RuntimeException("Action not allowed");
         }
         for (Submission submission : hackathon.getSubmissions()) {
             if (submission.getVote() == null) {

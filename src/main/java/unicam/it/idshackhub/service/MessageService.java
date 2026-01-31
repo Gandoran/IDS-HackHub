@@ -19,9 +19,14 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
+
 /**
- * Handles operations related to {@link Message} entities
- * like sending and processing messages.
+ * Provides operations related to Message lifecycle management.
+ * <p>
+ *     This service manages the creation and processing of
+ *     messages sent both within and outside an Hackathon context.
+ * </p>
  */
 @Service
 public class MessageService {
@@ -37,17 +42,14 @@ public class MessageService {
     }
 
     /**
-     * Sends a new message to a recipient.
-     * Validates the sender and message type before saving the message.
+     * Sends a message to a specific recipient.
+     * A message can be of various types, depending on the context
+     * (eg. Verification Request, Help Request).
      *
-     * @param sender
-     * @param recipient
-     * @param type
-     * @param content
-     * @param referenceId
      */
     @Transactional
     public void sendMessage(User sender, User recipient, MessageType type, String content, Long referenceId) {
+        validateMessageConsistency(type, recipient);
         Message message = new Message(
                 sender,
                 recipient,
@@ -56,24 +58,17 @@ public class MessageService {
                 ActionStatus.PENDING,
                 referenceId
         );
-        validateMessageStatus(message);
-        validateSender(message, sender);
-        validateRecipient(message, recipient);
-        messageRepository.save(message);
+        validateAndSave(message, sender);
     }
 
     /**
-     * Sends a new Staff invite message to a recipient.
-     * Validates the sender and message type before saving the message.
+     * Sends a Staff Invite to a specific recipient.
+     * A Staff Invite can be of two types: Judge Invite and Mentor Invite.
      *
-     * @param sender
-     * @param recipient
-     * @param type
-     * @param content
-     * @param referenceId
      */
     @Transactional
     public void sendStaffInvite(User sender, User recipient, MessageType type, String content, Long referenceId, ContextRole role) {
+        if (recipient == null) throw new IllegalArgumentException("Staff invites require a recipient.");
         StaffInvite message = new StaffInvite(
                 sender,
                 recipient,
@@ -83,62 +78,95 @@ public class MessageService {
                 referenceId,
                 role
         );
-        validateMessageStatus(message);
-        validateSender(message, sender);
-        validateRecipient(message, recipient);
-        messageRepository.save(message);
+        validateAndSave(message, sender);
     }
+
 
     /**
      * Processes a reply to a message.
-     * Validates the message status and recipient before executing the reply logic.
+     * This is only for messages that require a reply (eg. Verification Request).
      *
-     * @param messageId
-     * @param accepted
-     * @param currentUser
      */
     @Transactional
     public void processReply(Long messageId, boolean accepted, User currentUser) {
         Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new EntityNotFoundException("Message not found: " + messageId + "."));
+                .orElseThrow(() -> new EntityNotFoundException("Message not found: " + messageId));
+
         validateMessageStatus(message);
-        validateRecipient(message, currentUser);
+        validateAccessToReply(message, currentUser);
+
         MessageStrategy strategy = strategyMap.get(message.getType());
         if (strategy == null) {
-            throw new IllegalStateException("Strategy not found for message type: " + message.getType() + ".");}
-        if (accepted)
-        {strategy.executeAccept(message);}
-        else {strategy.executeReject(message);}
+            throw new IllegalStateException("No strategy found for message type: " + message.getType());
+        }
+
+        if (accepted) {
+            strategy.executeAccept(message);
+        } else {
+            strategy.executeReject(message);
+        }
+
         messageRepository.save(message);
     }
 
-    private void validateRecipient(Message message, User recipient) {
-        if (message.getType() == MessageType.VERIFY_USER_REQUEST) {
-            if (!PermissionChecker.checkPermission(recipient, Permission.Can_Manage_Verified_Request)) {
-                throw new RuntimeException("Permission denied");
-            }
+    // -- PRIVATE METHODS --
+
+    private void validateAndSave(Message message, User sender) {
+        validateMessageStatus(message);
+        if (!sender.equals(message.getSender())) {
+            throw new RuntimeException("Permission denied: Sender mismatch.");
         }
-        if (!recipient.equals(message.getRecipient())) {
-            throw new RuntimeException("Permission denied");
-        }
-        // TODO Recipient non deve già far parte dell'hackathon
+        messageRepository.save(message);
     }
 
-    private void validateSender(Message message, User sender) {
-        if(message.getType() == MessageType.VERIFY_USER_REQUEST) {
-            if(!PermissionChecker.checkPermission(sender, Permission.Can_Create_Verified_Request)) {
-                throw new RuntimeException("Permission denied");
-            }
+
+    private void validateMessageConsistency(MessageType type, User recipient) {
+        boolean isBroadcastType = isBroadcastType(type);
+
+        if (isBroadcastType && recipient != null) {
+            throw new IllegalArgumentException("Message type " + type + " must NOT have a specific recipient (Broadcast).");
         }
-        if (!sender.equals(message.getSender())) {
-            throw new RuntimeException("Permission denied");
+        if (!isBroadcastType && recipient == null) {
+            throw new IllegalArgumentException("Message type " + type + " REQUIRES a specific recipient.");
+        }
+    }
+
+
+    private void validateAccessToReply(Message message, User currentUser) {
+        if (message.getRecipient() != null) {
+            if (!currentUser.equals(message.getRecipient())) {
+                throw new RuntimeException("Permission denied: You are not the recipient.");
+            }
+            return;
+        }
+
+        Permission requiredPermission = getRequiredPermissionForBroadcast(message.getType());
+        if (requiredPermission != null) {
+            if (!checkPermission(currentUser, requiredPermission)) {
+                throw new RuntimeException("Permission denied: You don't have permission to manage this type of message.");
+            }
         }
     }
 
     private void validateMessageStatus(Message message) {
-        if (message.getActionStatus() == ActionStatus.ACCEPTED ||
-                message.getActionStatus() == ActionStatus.REJECTED) {
-            throw new IllegalStateException("Message already processed: " + message.getId() + ".");
+        if (message.getActionStatus() != ActionStatus.PENDING) {
+            throw new IllegalStateException("Message already processed. ID: " + message.getId());
         }
+    }
+
+
+    private boolean isBroadcastType(MessageType type) {
+        return switch (type) {
+            case VERIFY_USER_REQUEST, HELP_REQUEST -> true;
+            default -> false;
+        };
+    }
+
+    private Permission getRequiredPermissionForBroadcast(MessageType type) {
+        return switch (type) {
+            case VERIFY_USER_REQUEST -> Permission.Can_Manage_Verified_Request;
+            case HELP_REQUEST -> Permission.Can_Manage_Help_Request;
+            default -> null;
+        };
     }
 }

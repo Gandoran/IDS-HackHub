@@ -35,19 +35,19 @@ public enum ContextRole implements Role {
      * The event organizer.
      * Has permission to proclaim winners and invite judges.
      */
-    H_Organizer(EnumSet.of(Permission.Can_Proclamate_Winner, Permission.Can_Invite_Staff, Permission.Can_See_Submissions)),
+    H_Organizer(EnumSet.of(Permission.Can_proclaim_Winner, Permission.Can_Invite_Staff, Permission.Can_See_Submissions)),
 
     /**
      * A standard participant within a team.
-     * Typically has read-only access or internal team permissions (currently none explicitly defined).
+     * Has the specific permission to create help requests.
      */
-    H_HackathonTeamMember(EnumSet.noneOf(Permission.class)),
+    H_HackathonTeamMember(EnumSet.of(Permission.Can_Create_Help_Request)),
 
     /**
      * The leader of a participating team.
-     * Has the specific permission to submit the final project.
+     * Has the specific permission to submit the final project and create help requests.
      */
-    H_HackathonTeamLeader(EnumSet.of(Permission.Can_Submit));
+    H_HackathonTeamLeader(EnumSet.of(Permission.Can_Submit, Permission.Can_Create_Help_Request));
 
     /**
      * The set of permissions associated with this role.
