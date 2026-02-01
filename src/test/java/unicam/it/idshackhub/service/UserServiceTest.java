@@ -9,7 +9,9 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import unicam.it.idshackhub.model.message.Message;
 import unicam.it.idshackhub.model.message.MessageType;
+import unicam.it.idshackhub.model.team.Team;
 import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.role.permission.Permission;
 
@@ -77,4 +79,73 @@ class UserServiceTest {
         assertEquals("Permission denied: Cannot send verification request.", ex.getMessage());
         verifyNoInteractions(messageService);
     }
+
+    @Test
+    void sendJoinRequest_Success() {
+        Team targetTeam = new Team();
+        targetTeam.setId(101L);
+        User teamLeader = new User();
+        teamLeader.setId(202L);
+        targetTeam.setLeader(teamLeader);
+
+        permissionCheckerMock.when(() -> PermissionChecker.checkPermission(candidate, Permission.Can_Send_Join_Request))
+                .thenReturn(true);
+
+        String content = "I would like to join your team.";
+
+        userService.sendJoinRequest(candidate, targetTeam, content);
+
+        verify(messageService).sendMessage(
+                eq(candidate),
+                eq(teamLeader),
+                eq(MessageType.JOIN_TEAM_REQUEST),
+                eq(content),
+                eq(101L)
+        );
+    }
+
+    @Test
+    void sendJoinRequest_PermissionDenied() {
+        Team targetTeam = new Team();
+
+        permissionCheckerMock.when(() -> PermissionChecker.checkPermission(candidate, Permission.Can_Send_Join_Request))
+                .thenReturn(false);
+
+        RuntimeException ex = assertThrows(RuntimeException.class, () ->
+                userService.sendJoinRequest(candidate, targetTeam, "Let me in"));
+
+        assertEquals("Permission denied: Cannot send join request.", ex.getMessage());
+        verifyNoInteractions(messageService);
+    }
+
+    @Test
+    void sendJoinRequest_AlreadyInTeam() {
+        Team targetTeam = new Team();
+        Team currentTeam = new Team();
+        candidate.setUserTeam(currentTeam);
+
+        permissionCheckerMock.when(() -> PermissionChecker.checkPermission(candidate, Permission.Can_Send_Join_Request))
+                .thenReturn(true);
+
+        RuntimeException ex = assertThrows(RuntimeException.class, () ->
+                userService.sendJoinRequest(candidate, targetTeam, "Let me in"));
+
+        assertEquals("You are already in a team", ex.getMessage());
+        verifyNoInteractions(messageService);
+    }
+
+    @Test
+    void manageInvites_DelegatesToMessageService() {
+        Long messageId = 99L;
+        boolean accept = true;
+        Message expectedResponse = new Message();
+
+        when(messageService.processReply(messageId, accept, candidate)).thenReturn(expectedResponse);
+
+        Message result = userService.manageInvites(messageId, candidate, accept);
+
+        assertEquals(expectedResponse, result);
+        verify(messageService).processReply(messageId, accept, candidate);
+    }
+
 }

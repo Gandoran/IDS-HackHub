@@ -54,10 +54,10 @@ public class HackathonTeamService {
      */
     public Submission postSubmission(User hackathonTeamLeader, String description, HackathonTeam team, Hackathon hackathon) {
         if (!checkPermission(hackathonTeamLeader, Permission.Can_Submit, team)) {
-            throw new RuntimeException("Permission denied");
+            throw new RuntimeException("Permission denied: Cannot submit submission.");
         }
         if(!hackathon.isActionAllowed(Permission.Can_Submit)) {
-            throw new RuntimeException("Permission denied");
+            throw new RuntimeException("Permission denied: Cannot submit submission. Hackathon not in the correct state.");
         }
         Submission submission = team.getSubmission();
         if(submission != null) {

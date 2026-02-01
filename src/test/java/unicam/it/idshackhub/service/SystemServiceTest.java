@@ -56,7 +56,7 @@ class SystemServiceTest {
         when(hackathonRepository.save(any(Hackathon.class))).thenAnswer(i -> i.getArguments()[0]);
         when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArguments()[0]);
 
-        Hackathon result = systemService.createHackathon(hackathonOrganizer, "NewHack", "Desc", teamRules, schedule);
+        Hackathon result = systemService.createHackathon(hackathonOrganizer, "NewHack", "Desc", 100.0, teamRules, schedule);
 
         assertNotNull(result);
 

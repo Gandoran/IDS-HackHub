@@ -162,10 +162,10 @@ public class TeamService {
     }
 
     private void assignHackathonRoles(HackathonTeam hackTeam, Hackathon hackathon) {
+        hackTeam.getLeader().addAssignment(new Assignment(hackathon,ContextRole.H_HackathonTeamLeader));
         for (User member : hackTeam.getMembers()) {
             member.addAssignment(new Assignment(hackathon,ContextRole.H_HackathonTeamMember));
         }
-        hackTeam.getLeader().addAssignment(new Assignment(hackathon,ContextRole.H_HackathonTeamLeader));
     }
 
     private Team getMainTeam(User teamLeader) {

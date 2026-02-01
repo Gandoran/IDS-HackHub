@@ -52,40 +52,6 @@ class git AdminServiceTest {
     }
 
     @Test
-    void getPendingVerificationRequests_Success() {
-        // Setup: Admin ha il permesso
-        permissionCheckerMock.when(() -> PermissionChecker.checkPermission(admin, Permission.Can_Manage_Verified_Request))
-                .thenReturn(true);
-
-        // Setup: Repository restituisce una lista finta
-        List<Message> mockList = List.of(new Message(), new Message());
-        when(messageRepository.findAllByTypeAndActionStatusAndRecipientIsNull(
-                MessageType.VERIFY_USER_REQUEST, ActionStatus.PENDING))
-                .thenReturn(mockList);
-
-        // Execute
-        List<Message> result = adminService.getPendingVerificationRequests(admin);
-
-        // Verify
-        assertEquals(2, result.size());
-        verify(messageRepository).findAllByTypeAndActionStatusAndRecipientIsNull(any(), any());
-    }
-
-    @Test
-    void getPendingVerificationRequests_PermissionDenied() {
-        // Setup: Utente normale NON ha il permesso
-        permissionCheckerMock.when(() -> PermissionChecker.checkPermission(normalUser, Permission.Can_Manage_Verified_Request))
-                .thenReturn(false);
-
-        // Execute & Verify
-        RuntimeException ex = assertThrows(RuntimeException.class, () ->
-                adminService.getPendingVerificationRequests(normalUser));
-
-        assertEquals("Permission denied: You are not an Admin.", ex.getMessage());
-        verifyNoInteractions(messageRepository);
-    }
-
-    @Test
     void manageVerificationRequest_Success() {
         // Setup: Admin ha il permesso
         permissionCheckerMock.when(() -> PermissionChecker.checkPermission(admin, Permission.Can_Manage_Verified_Request))

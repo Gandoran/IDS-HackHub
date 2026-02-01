@@ -167,7 +167,7 @@ class MessageServiceTest {
         RuntimeException ex = assertThrows(RuntimeException.class, () ->
                 messageService.processReply(msgId, true, recipient));
 
-        assertEquals("Permission denied: Cannot manage verified requests.", ex.getMessage());
+        assertEquals("Permission denied: You don't have permission to manage this type of message.", ex.getMessage());
     }
 
     @Test
@@ -183,6 +183,6 @@ class MessageServiceTest {
         RuntimeException ex = assertThrows(RuntimeException.class, () ->
                 messageService.processReply(msgId, true, intruder));
 
-        assertEquals("Permission denied: Recipient mismatch.", ex.getMessage());
+        assertEquals("Permission denied: You are not the recipient.", ex.getMessage());
     }
 }
