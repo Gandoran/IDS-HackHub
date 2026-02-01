@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
 import unicam.it.idshackhub.model.hackathon.state.HackathonStatus;
+import unicam.it.idshackhub.model.message.Message;
+import unicam.it.idshackhub.model.message.MessageType;
 import unicam.it.idshackhub.model.team.HackathonTeam;
 import unicam.it.idshackhub.model.team.Team;
 import unicam.it.idshackhub.model.team.builder.HackathonTeamBuilder;
@@ -32,11 +34,13 @@ public class TeamService {
 
     private final HackathonTeamRepository hackathonTeamRepository;
     private final UserRepository userRepository;
+    private final MessageService messageService;
 
     @Autowired
-    public TeamService(HackathonTeamRepository hackathonTeamRepository, UserRepository userRepository) {
+    public TeamService(HackathonTeamRepository hackathonTeamRepository, UserRepository userRepository, MessageService messageService) {
         this.hackathonTeamRepository = hackathonTeamRepository;
         this.userRepository = userRepository;
+        this.messageService = messageService;
     }
 
     /**
@@ -52,15 +56,6 @@ public class TeamService {
      * The method creates a {@link unicam.it.idshackhub.model.team.HackathonTeam} via {@link unicam.it.idshackhub.model.team.builder.HackathonTeamBuilder},
      * links it to the Hackathon and main team, persists it, and assigns roles/assignments to participants.
      * </p>
-     *
-     * @param teamLeader the leader of the main team performing the registration.
-     * @param name the name of the Hackathon team.
-     * @param description the description of the Hackathon team.
-     * @param hackathonTeamLeader the user who will lead the team within the Hackathon.
-     * @param members the list of users participating in the Hackathon team.
-     * @param hackathon the Hackathon to register the team to.
-     * @return the persisted {@link unicam.it.idshackhub.model.team.HackathonTeam}.
-     * @throws RuntimeException if permissions or preconditions are not satisfied.
      */
     @Transactional
     public HackathonTeam registerHackathonTeam(User teamLeader, String name, String description, User hackathonTeamLeader, List<User> members, Hackathon hackathon) {
@@ -87,6 +82,31 @@ public class TeamService {
 
         return hackathonTeam;
     }
+
+    /**
+     * A Team Leader can invite a user to join his Team.
+     * The user will receive an invite Message.
+     */
+    @Transactional
+    public Message inviteUserToTeam(User invitedUser, User teamLeader) {
+        Team mainTeam = teamLeader.getUserTeam();
+
+        if (!checkPermission(teamLeader, Permission.Can_Invite_Users, teamLeader.getUserTeam())) {
+            throw new RuntimeException("Permission denied: Cannot invite user.");
+        }
+        if(invitedUser.getUserTeam()!=null) {
+            throw new RuntimeException("User already in a team");
+        }
+        return messageService.sendMessage(
+                teamLeader,
+                invitedUser,
+                MessageType.INVITE_USER_REQUEST,
+                "You have been invited to join "+ mainTeam.getName(),
+                mainTeam.getId()
+        );
+
+    }
+
 
     private void validatePermissions(User user, Team mainTeam) {
         if (!checkPermission(user, Permission.Can_Register_Team, mainTeam)) {

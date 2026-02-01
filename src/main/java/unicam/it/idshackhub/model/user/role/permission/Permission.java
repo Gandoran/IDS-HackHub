@@ -38,5 +38,7 @@ public enum Permission {
     /** Permission to manage help requests. */
     Can_Manage_Help_Request,
     /** Permission to create a new help request. */
-    Can_Create_Help_Request
+    Can_Create_Help_Request,
+    /** Permission to invite users to join a Team. */
+    Can_Invite_Users
 }
