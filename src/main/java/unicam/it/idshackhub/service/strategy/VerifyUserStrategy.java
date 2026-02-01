@@ -35,10 +35,9 @@ public class VerifyUserStrategy implements MessageStrategy {
     @Transactional
     public void executeAccept(Message message) {
         User userToVerify = message.getSender();
-
         userToVerify.setGlobalRole(GlobalRole.G_VerifiedUser);
         userRepository.save(userToVerify);
-
+        messageRepository.save(message);
         executeResponse(message, "Your verification request was approved!", ActionStatus.ACCEPTED);
     }
 
@@ -48,6 +47,7 @@ public class VerifyUserStrategy implements MessageStrategy {
      */
     @Override
     public void executeReject(Message message) {
+        messageRepository.save(message);
         executeResponse(message, "Your request was rejected.", ActionStatus.REJECTED);
     }
 

@@ -8,6 +8,7 @@ import unicam.it.idshackhub.model.message.ActionStatus;
 import unicam.it.idshackhub.model.message.Message;
 import unicam.it.idshackhub.model.message.MessageType;
 import unicam.it.idshackhub.model.message.StaffInvite;
+import unicam.it.idshackhub.model.user.assignment.Context;
 import unicam.it.idshackhub.service.strategy.MessageStrategy;
 import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.role.ContextRole;
@@ -45,7 +46,6 @@ public class MessageService {
      * Sends a message to a specific recipient.
      * A message can be of various types, depending on the context
      * (eg. Verification Request, Help Request).
-     *
      */
     @Transactional
     public Message sendMessage(User sender, User recipient, MessageType type, String content, Long referenceId) {
@@ -65,7 +65,6 @@ public class MessageService {
     /**
      * Sends a Staff Invite to a specific recipient.
      * A Staff Invite can be of two types: Judge Invite and Mentor Invite.
-     *
      */
     @Transactional
     public Message sendStaffInvite(User sender, User recipient, MessageType type, String content, Long referenceId, ContextRole role) {
@@ -83,35 +82,37 @@ public class MessageService {
         return message;
     }
 
-
     /**
      * Processes a reply to a message.
      * This is only for messages that require a reply (eg. Verification Request).
      *
      */
     @Transactional
-    public Message processReply(Long messageId, boolean accepted, User currentUser) {
+    public Message processReply(Long messageId, boolean accepted, User currentUser, Context context) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new EntityNotFoundException("Message not found: " + messageId));
 
         validateMessageStatus(message);
-        validateAccessToReply(message, currentUser);
+        validateAccessToReply(message, currentUser, context);
 
         MessageStrategy strategy = strategyMap.get(message.getType());
-        if (strategy == null) {
+        if (strategy == null)
             throw new IllegalStateException("No strategy found for message type: " + message.getType());
-        }
 
-        if (accepted) {
-            strategy.executeAccept(message);
-            message.setActionStatus(ActionStatus.ACCEPTED);
-        } else {
-            strategy.executeReject(message);
+        try {
+            if (accepted) {
+                strategy.executeAccept(message);
+                message.setActionStatus(ActionStatus.ACCEPTED);
+            } else {
+                strategy.executeReject(message);
+                message.setActionStatus(ActionStatus.REJECTED);
+            }
+        } catch (Exception e) {
             message.setActionStatus(ActionStatus.REJECTED);
+            strategy.executeResponse(message, "Action failed: " + e.getMessage(), ActionStatus.REJECTED);
         }
         return messageRepository.save(message);
     }
-
     // -- PRIVATE METHODS --
 
     private void validateAndSave(Message message, User sender) {
@@ -135,7 +136,7 @@ public class MessageService {
     }
 
 
-    private void validateAccessToReply(Message message, User currentUser) {
+    private void validateAccessToReply(Message message, User currentUser, Context context) {
         if (message.getRecipient() != null) {
             if (!currentUser.equals(message.getRecipient())) {
                 throw new RuntimeException("Permission denied: You are not the recipient.");
@@ -145,11 +146,20 @@ public class MessageService {
 
         Permission requiredPermission = getRequiredPermissionForBroadcast(message.getType());
         if (requiredPermission != null) {
-            if (!checkPermission(currentUser, requiredPermission)) {
+            boolean hasPermission;
+
+            if (context != null) {
+                hasPermission = checkPermission(currentUser, requiredPermission, context);
+            } else {
+                hasPermission = checkPermission(currentUser, requiredPermission);
+            }
+
+            if (!hasPermission) {
                 throw new RuntimeException("Permission denied: You don't have permission to manage this type of message.");
             }
         }
     }
+
 
     private void validateMessageStatus(Message message) {
         if (message.getActionStatus() != ActionStatus.PENDING) {

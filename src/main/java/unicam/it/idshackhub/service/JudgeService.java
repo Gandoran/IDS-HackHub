@@ -1,5 +1,6 @@
 package unicam.it.idshackhub.service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
@@ -9,7 +10,9 @@ import unicam.it.idshackhub.model.user.role.permission.Permission;
 import unicam.it.idshackhub.model.utils.Submission;
 import unicam.it.idshackhub.repository.HackathonRepository;
 import unicam.it.idshackhub.repository.SubmissionRepository;
+import unicam.it.idshackhub.repository.UserRepository;
 
+import static unicam.it.idshackhub.service.EntityUtils.getEntity;
 import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
 
 /**
@@ -22,26 +25,27 @@ import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
 @Service
 public class JudgeService {
 
+    private final UserRepository userRepository;
     private final SubmissionRepository submissionRepository;
     private final HackathonRepository hackathonRepository;
 
     @Autowired
-    public JudgeService(SubmissionRepository submissionRepository, HackathonRepository hackathonRepository) {
+    public JudgeService(SubmissionRepository submissionRepository, HackathonRepository hackathonRepository,
+                        UserRepository userRepository) {
         this.submissionRepository = submissionRepository;
         this.hackathonRepository = hackathonRepository;
+        this.userRepository = userRepository;
     }
 
     /**
      * Assigns a vote (0-10) to a submission within a Hackathon.
-     *
-     * @param judge the user performing the vote.
-     * @param submission the submission to be judged.
-     * @param hackathon the Hackathon context in which the vote is cast.
-     * @param vote the numeric vote to assign.
-     * @return the stored vote value.
-     * @throws RuntimeException if the judge lacks permission or the Hackathon is not in the evaluation state.
      */
-    public Integer judgeSubmission(User judge, Submission submission, Hackathon hackathon, int vote) {
+    @Transactional
+    public Integer judgeSubmission(Long judgeId, Long submissionId, Long hackathonId, int vote) {
+        User judge = getEntity(userRepository, judgeId, "Judge");
+        Submission submission = getEntity(submissionRepository, submissionId, "Submission");
+        Hackathon hackathon = getEntity(hackathonRepository, hackathonId, "Hackathon");
+
         if (!checkPermission(judge, Permission.Can_Vote, hackathon)) {
             throw new RuntimeException("Permission denied");
         }
@@ -59,18 +63,14 @@ public class JudgeService {
      * The evaluation can be closed only if the acting user has the proper permission and all submissions have
      * been assigned a vote.
      * </p>
-     *
-     * @param judge the user requesting the phase closure.
-     * @param hackathon the Hackathon whose evaluation phase is being closed.
-     * @return the new {@link unicam.it.idshackhub.model.hackathon.state.HackathonStatus} of the Hackathon.
-     * @throws RuntimeException if the judge lacks permission or some submission has not been voted yet.
      */
-    public HackathonStatus closeEvaluationState(User judge, Hackathon hackathon) {
+    @Transactional
+    public HackathonStatus closeEvaluationState(Long judgeId, Long hackathonId) {
+        User judge = getEntity(userRepository, judgeId, "Judge");
+        Hackathon hackathon = getEntity(hackathonRepository, hackathonId, "Hackathon");
+
         if (!checkPermission(judge, Permission.Can_End_Evaluation_State, hackathon)) {
             throw new RuntimeException("Permission denied");
-        }
-        if(!hackathon.isActionAllowed(Permission.Can_End_Evaluation_State)) {
-            throw new RuntimeException("Action not allowed");
         }
         for (Submission submission : hackathon.getSubmissions()) {
             if (submission.getVote() == null) {

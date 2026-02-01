@@ -54,7 +54,6 @@ public class StaffInvitationStrategy implements MessageStrategy {
             executeResponse(message, "Error: You are already involved in this Hackathon.", ActionStatus.REJECTED);
             return;
         }
-
         if(role == ContextRole.H_Judge){
             addJudge(hackathon, newStaffMember);
         }else if(role == ContextRole.H_Mentor){
@@ -63,7 +62,8 @@ public class StaffInvitationStrategy implements MessageStrategy {
             throw new IllegalStateException("Invalid role in invitation: " + role);
         }
         hackathonRepository.save(hackathon);
-        executeResponse(message, "You are now a " + role.name() + " for " + hackathon.getTitle(), ActionStatus.ACCEPTED);    }
+        executeResponse(message, "You are now a " + role.name() + " for " + hackathon.getTitle(), ActionStatus.ACCEPTED);
+    }
 
     /**
      * Processes the rejection of a staff invitation.

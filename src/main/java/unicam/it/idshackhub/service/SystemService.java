@@ -17,6 +17,7 @@ import unicam.it.idshackhub.repository.*;
 
 import java.util.ArrayList;
 
+import static unicam.it.idshackhub.service.EntityUtils.getEntity;
 import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
 
 /**
@@ -49,18 +50,11 @@ public class SystemService {
      * The created Hackathon is initialized through {@link unicam.it.idshackhub.model.hackathon.HackathonBuilder} and the
      * user is assigned as {@link unicam.it.idshackhub.model.user.role.ContextRole#H_Organizer}.
      * </p>
-     *
-     * @param verifiedUser the user creating the Hackathon.
-     * @param title the Hackathon title.
-     * @param description the Hackathon description.
-     * @param teamRules the rules that constrain team composition.
-     * @param schedule the schedule/location information.
-     * @return the persisted Hackathon.
-     * @throws RuntimeException if the user lacks permission.
      */
 
     @Transactional
-    public Hackathon createHackathon(User verifiedUser, String title, String description,Double prize, TeamRules teamRules, Schedule schedule) {
+    public Hackathon createHackathon(Long verifiedUserId, String title, String description,Double prize, TeamRules teamRules, Schedule schedule) {
+        User verifiedUser = getEntity(userRepository, verifiedUserId, "Organizer");
         if (!checkPermission(verifiedUser, Permission.Can_Create_Hackathon)) {
             throw new RuntimeException("Permission denied");
         }
@@ -86,23 +80,18 @@ public class SystemService {
      * {@link unicam.it.idshackhub.model.user.role.permission.Permission#Can_Create_Team}. The user is assigned
      * as {@link unicam.it.idshackhub.model.user.role.ContextRole#T_TeamLeader} in the created Team.
      * </p>
-     *
-     * @param user the user creating the team.
-     * @param name the team name.
-     * @param description the team description.
-     * @param payPalEmail the team's email.
-     * @return the persisted Team.
-     * @throws RuntimeException if the user is already in a team or lacks permission.
      */
-
     @Transactional
-    public Team createTeam(User user, String name, String description, String payPalEmail) {
+    public Team createTeam(Long userId, String name, String description, String payPalEmail) {
+        User user = getEntity(userRepository, userId, "Leader");
+
         if (user.getUserTeam() != null) {
             throw new RuntimeException("User already in a team");
         }
         if (!checkPermission(user, Permission.Can_Create_Team)) {
             throw new RuntimeException("Permission denied");
         }
+
         TeamBuilder builder = new TeamBuilder();
         Team team = builder.buildName(name)
                 .buildDescription(description)
@@ -110,8 +99,9 @@ public class SystemService {
                 .buildMembers(new ArrayList<>())
                 .buildPayPalAccount(payPalEmail)
                 .getResult();
+
         team = teamRepository.save(team);
-        user.addAssignment(new Assignment(team,ContextRole.T_TeamLeader));
+        user.addAssignment(new Assignment(team, ContextRole.T_TeamLeader));
         user.setUserTeam(team);
         userRepository.save(user);
         return team;

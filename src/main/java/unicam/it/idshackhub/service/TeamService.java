@@ -14,11 +14,13 @@ import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.assignment.Assignment;
 import unicam.it.idshackhub.model.user.role.ContextRole;
 import unicam.it.idshackhub.model.user.role.permission.Permission;
+import unicam.it.idshackhub.repository.HackathonRepository;
 import unicam.it.idshackhub.repository.HackathonTeamRepository;
 import unicam.it.idshackhub.repository.UserRepository;
 
 import java.util.List;
 
+import static unicam.it.idshackhub.service.EntityUtils.getEntity;
 import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
 
 /**
@@ -35,12 +37,17 @@ public class TeamService {
     private final HackathonTeamRepository hackathonTeamRepository;
     private final UserRepository userRepository;
     private final MessageService messageService;
+    private final HackathonRepository hackathonRepository;
 
     @Autowired
-    public TeamService(HackathonTeamRepository hackathonTeamRepository, UserRepository userRepository, MessageService messageService) {
+    public TeamService(HackathonTeamRepository hackathonTeamRepository,
+                       UserRepository userRepository,
+                       MessageService messageService,
+                       HackathonRepository hackathonRepository) {
         this.hackathonTeamRepository = hackathonTeamRepository;
         this.userRepository = userRepository;
         this.messageService = messageService;
+        this.hackathonRepository = hackathonRepository;
     }
 
     /**
@@ -58,7 +65,15 @@ public class TeamService {
      * </p>
      */
     @Transactional
-    public HackathonTeam registerHackathonTeam(User teamLeader, String name, String description, User hackathonTeamLeader, List<User> members, Hackathon hackathon) {
+    public HackathonTeam registerHackathonTeam(Long teamLeaderId, String name, String description, Long hackathonTeamLeaderId, List<Long> membersId, Long hackathonID) {
+        User teamLeader = getEntity(userRepository, teamLeaderId, "Leader");
+        User hackathonTeamLeader = getEntity(userRepository, hackathonTeamLeaderId, "HackTeam Leader");
+        Hackathon hackathon = getEntity(hackathonRepository, hackathonID, "Hackathon");
+
+        List<User> members = userRepository.findAllById(membersId);
+        if (members.size() != membersId.size()) {
+            throw new RuntimeException("Some member IDs provided were not found.");
+        }
         Team mainTeam = this.getMainTeam(teamLeader);
         validatePermissions(teamLeader, mainTeam);
         validateHackathonPermissions(hackathon);
@@ -105,6 +120,15 @@ public class TeamService {
                 mainTeam.getId()
         );
 
+    }
+
+    @Transactional
+    public Message manageJoinRequest(Long leaderId, Long messageId, boolean accept) {
+        User leader = getEntity(userRepository, leaderId, "Leader");
+        if (!checkPermission(leader, Permission.Can_Invite_Users, leader.getUserTeam())) {
+            throw new RuntimeException("Permission denied: Cannot manage join requests.");
+        }
+        return messageService.processReply(messageId, accept, leader,null);
     }
 
 

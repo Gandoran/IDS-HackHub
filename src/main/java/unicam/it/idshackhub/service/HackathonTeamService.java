@@ -4,16 +4,19 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
-import unicam.it.idshackhub.model.message.Message;
 import unicam.it.idshackhub.model.message.MessageType;
 import unicam.it.idshackhub.model.team.HackathonTeam;
 import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.role.permission.Permission;
 import unicam.it.idshackhub.model.utils.Submission;
+import unicam.it.idshackhub.repository.HackathonRepository;
+import unicam.it.idshackhub.repository.HackathonTeamRepository;
 import unicam.it.idshackhub.repository.SubmissionRepository;
+import unicam.it.idshackhub.repository.UserRepository;
 
 import java.time.LocalDateTime;
 
+import static unicam.it.idshackhub.service.EntityUtils.getEntity;
 import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
 
 /**
@@ -29,11 +32,17 @@ public class HackathonTeamService {
 
     private final SubmissionRepository submissionRepository;
     private final MessageService messageService;
+    private final UserRepository userRepository;
+    private final HackathonTeamRepository hackathonTeamRepository;
+    private final HackathonRepository hackathonRepository;
 
     @Autowired
-    public HackathonTeamService(SubmissionRepository submissionRepository, MessageService messageService) {
+    public HackathonTeamService(SubmissionRepository submissionRepository, MessageService messageService, UserRepository userRepository, HackathonTeamRepository hackathonTeamRepository, HackathonRepository hackathonRepository, EntityUtils entityUtils) {
         this.submissionRepository = submissionRepository;
         this.messageService = messageService;
+        this.userRepository = userRepository;
+        this.hackathonTeamRepository = hackathonTeamRepository;
+        this.hackathonRepository = hackathonRepository;
     }
 
     /**
@@ -44,20 +53,21 @@ public class HackathonTeamService {
      * If a submission already exists, only its description is updated; otherwise a new submission is created,
      * linked to both team and Hackathon, and then persisted.
      * </p>
-     *
-     * @param hackathonTeamLeader the user performing the submission (typically the team leader for that Hackathon).
-     * @param description the submission description.
-     * @param team the participating team within the Hackathon.
-     * @param hackathon the Hackathon to which the submission belongs.
-     * @return the persisted {@link unicam.it.idshackhub.model.utils.Submission}.
-     * @throws RuntimeException if the user does not have the required permission.
      */
-    public Submission postSubmission(User hackathonTeamLeader, String description, HackathonTeam team, Hackathon hackathon) {
-        if (!checkPermission(hackathonTeamLeader, Permission.Can_Submit, team)) {
-            throw new RuntimeException("Permission denied: Cannot submit submission.");
+    @Transactional
+    public Submission postSubmission(Long hackathonTeamLeaderId, String description, Long teamId, Long hackathonId) {
+        User leader = getEntity(userRepository, hackathonTeamLeaderId, "Leader");
+        HackathonTeam team = getEntity(hackathonTeamRepository, teamId, "Team");
+        Hackathon hackathon = getEntity(hackathonRepository, hackathonId, "Hackathon");
+
+        if(!team.getLeader().equals(leader)){
+            throw new RuntimeException("You are not the leader of this team.");
         }
-        if(!hackathon.isActionAllowed(Permission.Can_Submit)) {
-            throw new RuntimeException("Permission denied: Cannot submit submission. Hackathon not in the correct state.");
+        if (!checkPermission(leader, Permission.Can_Submit, hackathon)) {
+            throw new RuntimeException("You don't have submission rights.");
+        }
+        if (!hackathon.isActionAllowed(Permission.Can_Submit)) {
+            throw new RuntimeException("Submission not allowed in current phase.");
         }
         Submission submission = team.getSubmission();
         if(submission != null) {
@@ -69,25 +79,29 @@ public class HackathonTeamService {
             submission.setSubmissionDate(LocalDateTime.now());
             team.setSubmission(submission);
             hackathon.getSubmissions().add(submission);
-
         }
+
         return submissionRepository.save(submission);
     }
 
+    /**
+     * Sends a Help Request to the mentors of a given Hackathon.
+     */
     @Transactional
-    public Message requestHelp(User member, Hackathon hackathon, String problemDescription) {
-        if(!checkPermission(member, Permission.Can_Create_Help_Request, hackathon)){
-            throw new RuntimeException("Permission Denied: You cannot send help request.");
-        }
+    public void requestHelp(Long userId, Long hackathonId, String problemDescription) {
+        User member = getEntity(userRepository, userId, "User");
+        Hackathon hackathon = getEntity(hackathonRepository, hackathonId, "Hackathon");
+
         if (!hackathon.isActionAllowed(Permission.Can_Create_Help_Request)) {
-            throw new RuntimeException("Cannot send help request: Hackathon not in the correct state.");
+            throw new RuntimeException("Hackathon not in the correct state.");
         }
-        return messageService.sendMessage(
-                member,
-                null,
-                MessageType.HELP_REQUEST,
-                problemDescription,
-                hackathon.getId()
-        );
+        if (member.getRoleByContext(hackathon).isEmpty()) {
+            throw new RuntimeException("You are not participating in this Hackathon.");
+        }
+        if(!checkPermission(member, Permission.Can_Create_Help_Request, hackathon)){
+            throw new RuntimeException("You cannot send help request.");
+        }
+
+        messageService.sendMessage(member, null, MessageType.HELP_REQUEST, problemDescription, hackathon.getId());
     }
 }

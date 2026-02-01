@@ -1,11 +1,14 @@
 package unicam.it.idshackhub.service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import unicam.it.idshackhub.model.message.Message;
 import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.role.permission.Permission;
+import unicam.it.idshackhub.repository.UserRepository;
 
+import static unicam.it.idshackhub.service.EntityUtils.getEntity;
 import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
 
 /**
@@ -15,10 +18,13 @@ import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
 public class AdminService {
 
     private final MessageService messageService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public AdminService(MessageService messageService) {
+    public AdminService(MessageService messageService,
+                        UserRepository userRepository) {
         this.messageService = messageService;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -26,10 +32,12 @@ public class AdminService {
      * The MessageService delegates the actual business logic to the appropriate strategy.
      * There are additional checks to ensure that the Admin is allowed to perform this action.
      */
-    public Message manageVerificationRequest(User admin, Long messageId, boolean accept) {
+    @Transactional
+    public Message manageVerificationRequest(Long adminId, Long messageId, boolean accept) {
+        User admin = getEntity(userRepository, adminId, "Admin");
         if (!checkPermission(admin, Permission.Can_Manage_Verified_Request)) {
-            throw new RuntimeException("Permission denied: You are not an Admin.");
+            throw new RuntimeException("You are not an Admin.");
         }
-        return messageService.processReply(messageId, accept, admin);
+        return messageService.processReply(messageId, accept, admin,null);
     }
 }

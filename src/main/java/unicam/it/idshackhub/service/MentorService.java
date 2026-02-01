@@ -1,12 +1,15 @@
 package unicam.it.idshackhub.service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
-import unicam.it.idshackhub.model.message.Message;
 import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.role.permission.Permission;
+import unicam.it.idshackhub.repository.HackathonRepository;
+import unicam.it.idshackhub.repository.UserRepository;
 import unicam.it.idshackhub.service.email.icalendar.ICalendarDetails;
 
+import static unicam.it.idshackhub.service.EntityUtils.getEntity;
 import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
 
 /**
@@ -19,10 +22,15 @@ import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
 public class MentorService {
     private final MessageService messageService;
     private final EmailService emailService;
+    private final UserRepository userRepository;
+    private final HackathonRepository hackathonRepository;
 
-    public MentorService(MessageService messageService, EmailService emailService) {
+    public MentorService(MessageService messageService, EmailService emailService, UserRepository userRepository,
+                         HackathonRepository hackathonRepository){
         this.messageService = messageService;
         this.emailService = emailService;
+        this.userRepository = userRepository;
+        this.hackathonRepository = hackathonRepository;
     }
 
     /**
@@ -30,11 +38,14 @@ public class MentorService {
      * Can either accept or reject it.
      *
      */
-    public Message manageRequest(User mentor, Hackathon hackathon, Message message, boolean accept) {
+    @Transactional
+    public void manageRequest(Long mentorId, Long hackathonId, Long messageId, boolean accept) {
+        User mentor = getEntity(userRepository, mentorId, "Mentor");
+        Hackathon hackathon = getEntity(hackathonRepository, hackathonId, "Hackathon");
         if (!checkPermission(mentor, Permission.Can_Manage_Help_Request, hackathon)) {
             throw new RuntimeException("Permission denied");
         }
-        return messageService.processReply(message.getId(), accept, mentor);
+        messageService.processReply(messageId, accept, mentor, hackathon);
     }
 
     /**
