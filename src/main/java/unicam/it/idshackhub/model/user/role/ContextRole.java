@@ -17,7 +17,7 @@ public enum ContextRole implements Role {
      * The leader/manager of the team.
      * Has permissions to register the team for events and create hackathon sub-teams.
      */
-    T_TeamLeader(EnumSet.of(Permission.Can_Register_Team, Permission.Can_Create_HackathonTeam)),
+    T_TeamLeader(EnumSet.of(Permission.Can_Register_Team, Permission.Can_Create_HackathonTeam, Permission.Can_Invite_Users)),
 
     /**
      * A judge responsible for evaluating projects.

@@ -19,7 +19,7 @@ public enum GlobalRole implements Role {
     /**
      * A user identity that has been verified. Can create Hackathons and Teams.
      */
-    G_VerifiedUser(EnumSet.of(Permission.Can_Create_Hackathon, Permission.Can_Create_Team)),
+    G_VerifiedUser(EnumSet.of(Permission.Can_Create_Hackathon, Permission.Can_Create_Team, Permission.Can_Send_Join_Request)),
 
     /**
      * The platform administrator. Can manage user requests and system settings.
@@ -29,7 +29,7 @@ public enum GlobalRole implements Role {
     /**
      * The default role for a newly registered user. Limited basic permissions.
      */
-    G_NormalUser(EnumSet.of(Permission.Can_Create_Verified_Request, Permission.Can_Create_Team));
+    G_NormalUser(EnumSet.of(Permission.Can_Create_Verified_Request, Permission.Can_Create_Team, Permission.Can_Send_Join_Request));
 
     /**
      * The set of permissions associated with this role.

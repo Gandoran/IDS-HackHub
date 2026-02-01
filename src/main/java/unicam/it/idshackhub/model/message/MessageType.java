@@ -9,12 +9,14 @@ public enum MessageType {
     INVITE_STAFF_REQUEST,
     HELP_REQUEST,
     INVITE_USER_REQUEST,
+    JOIN_TEAM_REQUEST,
 
     // Risposte
     VERIFY_USER_RESPONSE,
     INVITE_STAFF_RESPONSE,
     HELP_RESPONSE,
-    INVITE_USER_RESPONSE;
+    INVITE_USER_RESPONSE,
+    JOIN_TEAM_RESPONSE;
 
     /**
      * Returns the opposite message type (REQUEST -> RESPONSE).
@@ -26,6 +28,7 @@ public enum MessageType {
             case INVITE_STAFF_REQUEST -> INVITE_STAFF_RESPONSE;
             case HELP_REQUEST -> HELP_RESPONSE;
             case INVITE_USER_REQUEST -> INVITE_USER_RESPONSE;
+            case JOIN_TEAM_REQUEST -> JOIN_TEAM_RESPONSE;
             default -> null;
         };
     }

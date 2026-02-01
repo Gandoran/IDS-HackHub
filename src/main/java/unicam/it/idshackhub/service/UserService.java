@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import unicam.it.idshackhub.model.message.Message;
 import unicam.it.idshackhub.model.message.MessageType;
+import unicam.it.idshackhub.model.team.Team;
 import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.role.permission.Permission;
 
@@ -39,6 +40,27 @@ public class UserService {
      */
     public Message manageInvites(Long messageId, User sender, boolean accept) {
         return messageService.processReply(messageId, accept, sender);
+    }
+
+    /**
+     * Sends a join request to a team leader.
+     */
+    @Transactional
+    public Message sendJoinRequest(User sender, Team team, String content) {
+
+        if (!checkPermission(sender, Permission.Can_Send_Join_Request)) {
+            throw new RuntimeException("Permission denied: Cannot send join request.");
+        }
+        if (sender.getUserTeam() != null) {
+            throw new RuntimeException("You are already in a team");
+        }
+        return messageService.sendMessage(
+                sender,
+                team.getLeader(),
+                MessageType.JOIN_TEAM_REQUEST,
+                content,
+                team.getId()
+        );
     }
 
     private void validateUser(User user) {
