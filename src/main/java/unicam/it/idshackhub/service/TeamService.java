@@ -103,7 +103,10 @@ public class TeamService {
      * The user will receive an invite Message.
      */
     @Transactional
-    public Message inviteUserToTeam(User invitedUser, User teamLeader) {
+    public Message inviteUserToTeam(Long invitedUserId, Long teamLeaderId) {
+        User invitedUser = getEntity(userRepository, invitedUserId, "Invited User");
+        User teamLeader = getEntity(userRepository, teamLeaderId, "Team Leader");
+
         Team mainTeam = teamLeader.getUserTeam();
 
         if (!checkPermission(teamLeader, Permission.Can_Invite_Users, teamLeader.getUserTeam())) {

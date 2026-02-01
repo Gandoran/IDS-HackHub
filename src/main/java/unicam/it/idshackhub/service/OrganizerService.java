@@ -4,8 +4,10 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
+import unicam.it.idshackhub.model.hackathon.state.HackathonStatus;
 import unicam.it.idshackhub.model.message.Message;
 import unicam.it.idshackhub.model.message.MessageType;
+import unicam.it.idshackhub.model.team.HackathonTeam;
 import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.role.ContextRole;
 import unicam.it.idshackhub.model.user.role.permission.Permission;
@@ -28,13 +30,18 @@ public class OrganizerService {
     private final MessageService messageService;
     private final UserRepository userRepository;
     private final HackathonRepository hackathonRepository;
+    private final SubmissionRepository submissionRepository;
+    private final PayPalService payPalService;
 
     @Autowired
     public OrganizerService(MessageService messageService, UserRepository userRepository,
-                            HackathonRepository hackathonRepository) {
+                            HackathonRepository hackathonRepository, SubmissionRepository submissionRepository,
+                            PayPalService payPalService) {
         this.messageService = messageService;
         this.userRepository = userRepository;
         this.hackathonRepository = hackathonRepository;
+        this.submissionRepository = submissionRepository;
+        this.payPalService = payPalService;
     }
 
 
@@ -73,4 +80,43 @@ public class OrganizerService {
                 role
         );
     }
+
+    /**
+     * Proclaims the winner of a Hackathon.
+     * The winner is selected through the {@link SubmissionRepository}
+     * and the payment is processed through PayPal.
+     * <p>
+     *     The team with the best vote is declared the winner.
+     * </p>
+     *
+     */
+    @Transactional
+    public HackathonTeam proclaimWinner(Long organizerId, Long hackathonId) {
+        User organizer = getEntity(userRepository, organizerId, "Organizer");
+        Hackathon hackathon = getEntity(hackathonRepository, hackathonId, "Hackathon");
+
+        if (!checkPermission(organizer, Permission.Can_Proclaim_Winner, hackathon)) {
+            throw new RuntimeException("Permission denied");
+        }
+        if (!hackathon.isActionAllowed(Permission.Can_Proclaim_Winner)) {
+            throw new RuntimeException("Hackathon not in the correct state");
+        }
+
+        HackathonTeam winnerTeam = submissionRepository.findWinner(hackathon.getId());
+        if (winnerTeam == null) throw new RuntimeException("No winner found.");
+
+        hackathon.setWinner(winnerTeam);
+        hackathon.setStatus(HackathonStatus.ARCHIVED);
+        hackathonRepository.save(hackathon);
+        try {
+            String orderId = payPalService.initiatePayment(hackathon.getPrize(), winnerTeam.getMainTeam().getPayPalAccount());
+            payPalService.confirmPayment(orderId);
+            hackathon.setStatus(HackathonStatus.ARCHIVED);
+            hackathonRepository.save(hackathon);
+        } catch (Exception e) {
+            throw new RuntimeException("Winner selected but Payment failed: " + e.getMessage());
+        }
+        return winnerTeam;
+    }
+
 }
