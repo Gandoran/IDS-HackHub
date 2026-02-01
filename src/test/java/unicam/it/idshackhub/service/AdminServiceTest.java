@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class AdminServiceTest {
+class git AdminServiceTest {
 
     @Mock private MessageRepository messageRepository;
     @Mock private MessageService messageService;
