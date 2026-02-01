@@ -87,4 +87,12 @@ public class UserService {
             throw new PermissionDeniedException("Permission denied: Cannot send verification request.");
         }
     }
+
+    public User processOAuthPostLogin(String authorizationId, String username, String email) {
+        return userRepository.findByAuthorizationId(authorizationId)
+                .orElseGet(() -> {
+                    User newUser = new User(0, authorizationId, username, email, null);
+                    return userRepository.save(newUser);
+                });
+    }
 }

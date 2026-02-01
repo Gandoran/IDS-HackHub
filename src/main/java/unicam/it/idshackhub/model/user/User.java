@@ -59,6 +59,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     private GlobalRole globalRole;
 
+    @Column(unique=true)
+    private String authorizationId;
+
     /**
      * A list of contextual assignments linking the user to specific Teams or Hackathons with specific roles.
      */
@@ -79,7 +82,7 @@ public class User {
      * @param email        the email address.
      * @param passwordHash the password hash.
      */
-    public User(long id, String username, String email, String passwordHash){
+    public User(long id, String username, String email, String passwordHash, String authorizationId){
         this.id = id;
         this.username = username;
         this.email = email;
@@ -87,6 +90,7 @@ public class User {
         this.globalRole = GlobalRole.G_NormalUser;
         this.assignments = new ArrayList<>();
         this.userTeam = null;
+        this.authorizationId = authorizationId;
     }
 
     /**
