@@ -4,6 +4,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import unicam.it.idshackhub.exception.InvalidOperationException;
+import unicam.it.idshackhub.exception.PermissionDeniedException;
 import unicam.it.idshackhub.model.message.ActionStatus;
 import unicam.it.idshackhub.model.message.Message;
 import unicam.it.idshackhub.model.message.MessageType;
@@ -98,7 +100,6 @@ public class MessageService {
         MessageStrategy strategy = strategyMap.get(message.getType());
         if (strategy == null)
             throw new IllegalStateException("No strategy found for message type: " + message.getType());
-
         try {
             if (accepted) {
                 strategy.executeAccept(message);
@@ -118,7 +119,7 @@ public class MessageService {
     private void validateAndSave(Message message, User sender) {
         validateMessageStatus(message);
         if (!sender.equals(message.getSender())) {
-            throw new RuntimeException("Permission denied: Sender mismatch.");
+            throw new PermissionDeniedException("Permission denied: Sender mismatch.");
         }
         messageRepository.save(message);
     }
@@ -128,10 +129,10 @@ public class MessageService {
         boolean isBroadcastType = isBroadcastType(type);
 
         if (isBroadcastType && recipient != null) {
-            throw new IllegalArgumentException("Message type " + type + " must NOT have a specific recipient (Broadcast).");
+            throw new InvalidOperationException("Message type " + type + " must NOT have a specific recipient (Broadcast).");
         }
         if (!isBroadcastType && recipient == null) {
-            throw new IllegalArgumentException("Message type " + type + " REQUIRES a specific recipient.");
+            throw new InvalidOperationException("Message type " + type + " REQUIRES a specific recipient.");
         }
     }
 
@@ -139,7 +140,7 @@ public class MessageService {
     private void validateAccessToReply(Message message, User currentUser, Context context) {
         if (message.getRecipient() != null) {
             if (!currentUser.equals(message.getRecipient())) {
-                throw new RuntimeException("Permission denied: You are not the recipient.");
+                throw new PermissionDeniedException("Permission denied: You are not the recipient.");
             }
             return;
         }
@@ -155,7 +156,7 @@ public class MessageService {
             }
 
             if (!hasPermission) {
-                throw new RuntimeException("Permission denied: You don't have permission to manage this type of message.");
+                throw new PermissionDeniedException("Permission denied: You don't have permission to manage this type of message.");
             }
         }
     }
@@ -163,7 +164,7 @@ public class MessageService {
 
     private void validateMessageStatus(Message message) {
         if (message.getActionStatus() != ActionStatus.PENDING) {
-            throw new IllegalStateException("Message already processed. ID: " + message.getId());
+            throw new InvalidOperationException("Message already processed. ID: " + message.getId());
         }
     }
 

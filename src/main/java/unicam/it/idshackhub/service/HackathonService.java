@@ -28,17 +28,10 @@ import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
 public class HackathonService {
 
     private final HackathonRepository hackathonRepository;
-    private final SubmissionRepository submissionRepository;
-    private final PayPalService payPalService;
-    private final UserRepository userRepository;
 
     @Autowired
-    public HackathonService(HackathonRepository hackathonRepository, SubmissionRepository submissionRepository, PayPalService payPalService
-    , UserRepository userRepository) {
+    public HackathonService(HackathonRepository hackathonRepository) {
         this.hackathonRepository = hackathonRepository;
-        this.submissionRepository = submissionRepository;
-        this.payPalService = payPalService;
-        this.userRepository = userRepository;
     }
 
     /**

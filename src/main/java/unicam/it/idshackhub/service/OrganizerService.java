@@ -3,6 +3,8 @@ package unicam.it.idshackhub.service;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import unicam.it.idshackhub.exception.InvalidOperationException;
+import unicam.it.idshackhub.exception.PermissionDeniedException;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
 import unicam.it.idshackhub.model.hackathon.state.HackathonStatus;
 import unicam.it.idshackhub.model.message.Message;
@@ -60,7 +62,7 @@ public class OrganizerService {
         }
 
         if(!checkPermission(organizer, Permission.Can_Invite_Staff, hackathon)){
-            throw new RuntimeException("Permission denied: You are not authorized to invite staff.");
+            throw new PermissionDeniedException("Permission denied: You are not authorized to invite staff.");
         }
 
         if(!hackathon.isActionAllowed(Permission.Can_Invite_Staff)) {
@@ -96,14 +98,14 @@ public class OrganizerService {
         Hackathon hackathon = getEntity(hackathonRepository, hackathonId, "Hackathon");
 
         if (!checkPermission(organizer, Permission.Can_Proclaim_Winner, hackathon)) {
-            throw new RuntimeException("Permission denied");
+            throw new PermissionDeniedException("Permission denied");
         }
         if (!hackathon.isActionAllowed(Permission.Can_Proclaim_Winner)) {
-            throw new RuntimeException("Hackathon not in the correct state");
+            throw new InvalidOperationException("Hackathon not in the correct state");
         }
 
         HackathonTeam winnerTeam = submissionRepository.findWinner(hackathon.getId());
-        if (winnerTeam == null) throw new RuntimeException("No winner found.");
+        if (winnerTeam == null) throw new InvalidOperationException("No winner found.");
 
         hackathon.setWinner(winnerTeam);
         hackathon.setStatus(HackathonStatus.ARCHIVED);
@@ -114,7 +116,7 @@ public class OrganizerService {
             hackathon.setStatus(HackathonStatus.ARCHIVED);
             hackathonRepository.save(hackathon);
         } catch (Exception e) {
-            throw new RuntimeException("Winner selected but Payment failed: " + e.getMessage());
+            throw new InvalidOperationException("Winner selected but Payment failed: " + e.getMessage());
         }
         return winnerTeam;
     }

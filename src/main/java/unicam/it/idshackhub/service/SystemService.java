@@ -3,6 +3,8 @@ package unicam.it.idshackhub.service;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import unicam.it.idshackhub.exception.InvalidOperationException;
+import unicam.it.idshackhub.exception.PermissionDeniedException;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
 import unicam.it.idshackhub.model.hackathon.HackathonBuilder;
 import unicam.it.idshackhub.model.hackathon.Schedule;
@@ -56,7 +58,7 @@ public class SystemService {
     public Hackathon createHackathon(Long verifiedUserId, String title, String description,Double prize, TeamRules teamRules, Schedule schedule) {
         User verifiedUser = getEntity(userRepository, verifiedUserId, "Organizer");
         if (!checkPermission(verifiedUser, Permission.Can_Create_Hackathon)) {
-            throw new RuntimeException("Permission denied");
+            throw new PermissionDeniedException("Permission denied");
         }
         HackathonBuilder hackathonBuilder = new HackathonBuilder();
         Hackathon hackathon = hackathonBuilder.reset()
@@ -86,10 +88,10 @@ public class SystemService {
         User user = getEntity(userRepository, userId, "Leader");
 
         if (user.getUserTeam() != null) {
-            throw new RuntimeException("User already in a team");
+            throw new InvalidOperationException("User already in a team");
         }
         if (!checkPermission(user, Permission.Can_Create_Team)) {
-            throw new RuntimeException("Permission denied");
+            throw new PermissionDeniedException("Permission denied");
         }
 
         TeamBuilder builder = new TeamBuilder();

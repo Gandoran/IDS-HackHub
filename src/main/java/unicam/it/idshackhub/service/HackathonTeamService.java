@@ -3,6 +3,8 @@ package unicam.it.idshackhub.service;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import unicam.it.idshackhub.exception.InvalidOperationException;
+import unicam.it.idshackhub.exception.PermissionDeniedException;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
 import unicam.it.idshackhub.model.message.MessageType;
 import unicam.it.idshackhub.model.team.HackathonTeam;
@@ -61,13 +63,13 @@ public class HackathonTeamService {
         Hackathon hackathon = getEntity(hackathonRepository, hackathonId, "Hackathon");
 
         if(!team.getLeader().equals(leader)){
-            throw new RuntimeException("You are not the leader of this team.");
+            throw new PermissionDeniedException("You are not the leader of this team.");
         }
         if (!checkPermission(leader, Permission.Can_Submit, hackathon)) {
-            throw new RuntimeException("You don't have submission rights.");
+            throw new PermissionDeniedException("You don't have submission rights.");
         }
         if (!hackathon.isActionAllowed(Permission.Can_Submit)) {
-            throw new RuntimeException("Submission not allowed in current phase.");
+            throw new InvalidOperationException("Submission not allowed in current phase.");
         }
         Submission submission = team.getSubmission();
         if(submission != null) {
@@ -93,13 +95,13 @@ public class HackathonTeamService {
         Hackathon hackathon = getEntity(hackathonRepository, hackathonId, "Hackathon");
 
         if (!hackathon.isActionAllowed(Permission.Can_Create_Help_Request)) {
-            throw new RuntimeException("Hackathon not in the correct state.");
+            throw new InvalidOperationException("Hackathon not in the correct state.");
         }
         if (member.getRoleByContext(hackathon).isEmpty()) {
             throw new RuntimeException("You are not participating in this Hackathon.");
         }
         if(!checkPermission(member, Permission.Can_Create_Help_Request, hackathon)){
-            throw new RuntimeException("You cannot send help request.");
+            throw new PermissionDeniedException("You cannot send help request.");
         }
 
         messageService.sendMessage(member, null, MessageType.HELP_REQUEST, problemDescription, hackathon.getId());

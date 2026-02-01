@@ -3,6 +3,7 @@ package unicam.it.idshackhub.service;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import unicam.it.idshackhub.exception.PermissionDeniedException;
 import unicam.it.idshackhub.model.message.Message;
 import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.role.permission.Permission;
@@ -36,7 +37,7 @@ public class AdminService {
     public Message manageVerificationRequest(Long adminId, Long messageId, boolean accept) {
         User admin = getEntity(userRepository, adminId, "Admin");
         if (!checkPermission(admin, Permission.Can_Manage_Verified_Request)) {
-            throw new RuntimeException("You are not an Admin.");
+            throw new PermissionDeniedException("You are not an Admin.");
         }
         return messageService.processReply(messageId, accept, admin,null);
     }

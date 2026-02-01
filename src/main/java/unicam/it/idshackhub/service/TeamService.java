@@ -3,6 +3,8 @@ package unicam.it.idshackhub.service;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import unicam.it.idshackhub.exception.InvalidOperationException;
+import unicam.it.idshackhub.exception.PermissionDeniedException;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
 import unicam.it.idshackhub.model.hackathon.state.HackathonStatus;
 import unicam.it.idshackhub.model.message.Message;
@@ -72,7 +74,7 @@ public class TeamService {
 
         List<User> members = userRepository.findAllById(membersId);
         if (members.size() != membersId.size()) {
-            throw new RuntimeException("Some member IDs provided were not found.");
+            throw new InvalidOperationException("Some member IDs provided were not found.");
         }
         Team mainTeam = this.getMainTeam(teamLeader);
         validatePermissions(teamLeader, mainTeam);
@@ -110,7 +112,7 @@ public class TeamService {
         Team mainTeam = teamLeader.getUserTeam();
 
         if (!checkPermission(teamLeader, Permission.Can_Invite_Users, teamLeader.getUserTeam())) {
-            throw new RuntimeException("Permission denied: Cannot invite user.");
+            throw new PermissionDeniedException("Permission denied: Cannot invite user.");
         }
         if(invitedUser.getUserTeam()!=null) {
             throw new RuntimeException("User already in a team");
@@ -129,7 +131,7 @@ public class TeamService {
     public Message manageJoinRequest(Long leaderId, Long messageId, boolean accept) {
         User leader = getEntity(userRepository, leaderId, "Leader");
         if (!checkPermission(leader, Permission.Can_Invite_Users, leader.getUserTeam())) {
-            throw new RuntimeException("Permission denied: Cannot manage join requests.");
+            throw new PermissionDeniedException("Permission denied: Cannot manage join requests.");
         }
         return messageService.processReply(messageId, accept, leader,null);
     }
@@ -137,23 +139,23 @@ public class TeamService {
 
     private void validatePermissions(User user, Team mainTeam) {
         if (!checkPermission(user, Permission.Can_Register_Team, mainTeam)) {
-            throw new RuntimeException("Permission denied");
+            throw new PermissionDeniedException("Permission denied");
         }
     }
 
     private void validateHackathonPermissions(Hackathon hackathon) {
         if (!hackathon.isActionAllowed(Permission.Can_Register_Team)) {
-            throw new RuntimeException("Permission denied: cannot register team.");
+            throw new PermissionDeniedException("Permission denied: cannot register team.");
         }
         if (hackathon.getStatus() != HackathonStatus.REGISTRATION) {
-            throw new RuntimeException("Hackathon not in the registration phase");
+            throw new InvalidOperationException("Hackathon not in the registration phase");
         }
     }
 
     private void validateMembersAvailability(List<User> members, Hackathon hackathon) {
         for (User member : members) {
             if (member.getRoleByContext(hackathon).isPresent()) {
-                throw new RuntimeException("User already in the hackathon");
+                throw new InvalidOperationException("User already in the hackathon");
             }
         }
     }
@@ -162,19 +164,19 @@ public class TeamService {
         boolean alreadyParticipating = hackathon.getTeams().stream()
                 .anyMatch(ht -> ht.getMainTeam().equals(mainTeam));
         if (alreadyParticipating) {
-            throw new RuntimeException("Main Team already has a Hackathon Team");
+            throw new InvalidOperationException("Main Team already has a Hackathon Team");
         }
     }
 
     private void validateHackathonRules(int teamSize, Hackathon hackathon) {
         if (hackathon.getTeams().size() >= hackathon.getRules().getMaxTeams()) {
-            throw new RuntimeException("Maximum team amount reached");
+            throw new InvalidOperationException("Maximum team amount reached");
         }
         if (teamSize > hackathon.getRules().getMaxPlayersPerTeam()) {
-            throw new RuntimeException("Team size is too big");
+            throw new InvalidOperationException("Team size is too big");
         }
         if (teamSize < hackathon.getRules().getMinPlayersPerTeam()) {
-            throw new RuntimeException("Team size is too small");
+            throw new InvalidOperationException("Team size is too small");
         }
     }
 
@@ -198,6 +200,6 @@ public class TeamService {
     private Team getMainTeam(User teamLeader) {
         return teamLeader.getContextByRole(ContextRole.T_TeamLeader)
                 .map(context -> (Team) context)
-                .orElseThrow(() -> new RuntimeException("You have to be a Team Leader of a Main Team to create a Hackathon Team"));
+                .orElseThrow(() -> new PermissionDeniedException("You have to be a Team Leader of a Main Team to create a Hackathon Team"));
     }
 }

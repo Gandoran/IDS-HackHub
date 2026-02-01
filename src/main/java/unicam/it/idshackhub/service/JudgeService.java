@@ -3,6 +3,8 @@ package unicam.it.idshackhub.service;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import unicam.it.idshackhub.exception.InvalidOperationException;
+import unicam.it.idshackhub.exception.PermissionDeniedException;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
 import unicam.it.idshackhub.model.hackathon.state.HackathonStatus;
 import unicam.it.idshackhub.model.user.User;
@@ -47,10 +49,10 @@ public class JudgeService {
         Hackathon hackathon = getEntity(hackathonRepository, hackathonId, "Hackathon");
 
         if (!checkPermission(judge, Permission.Can_Vote, hackathon)) {
-            throw new RuntimeException("Permission denied");
+            throw new PermissionDeniedException("Permission denied");
         }
         if (!hackathon.isActionAllowed(Permission.Can_Vote)) {
-            throw new RuntimeException("Hackathon not in the evaluation state");
+            throw new InvalidOperationException("Hackathon not in the evaluation state");
         }
         submission.setVote(vote);
         submissionRepository.save(submission);
@@ -70,11 +72,11 @@ public class JudgeService {
         Hackathon hackathon = getEntity(hackathonRepository, hackathonId, "Hackathon");
 
         if (!checkPermission(judge, Permission.Can_End_Evaluation_State, hackathon)) {
-            throw new RuntimeException("Permission denied");
+            throw new PermissionDeniedException("Permission denied");
         }
         for (Submission submission : hackathon.getSubmissions()) {
             if (submission.getVote() == null) {
-                throw new RuntimeException("Submission without a vote");
+                throw new InvalidOperationException("Submission without a vote");
             }
         }
         hackathon.setStatus(HackathonStatus.CONCLUSION);

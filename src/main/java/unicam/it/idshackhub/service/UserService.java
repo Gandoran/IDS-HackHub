@@ -3,6 +3,8 @@ package unicam.it.idshackhub.service;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import unicam.it.idshackhub.exception.InvalidOperationException;
+import unicam.it.idshackhub.exception.PermissionDeniedException;
 import unicam.it.idshackhub.model.message.Message;
 import unicam.it.idshackhub.model.message.MessageType;
 import unicam.it.idshackhub.model.team.Team;
@@ -66,10 +68,10 @@ public class UserService {
         Team team = getEntity(teamRepository, teamId, "Team");
 
         if (!checkPermission(sender, Permission.Can_Send_Join_Request)) {
-            throw new RuntimeException("Permission denied: Cannot send join request.");
+            throw new PermissionDeniedException("Permission denied: Cannot send join request.");
         }
         if (sender.getUserTeam() != null) {
-            throw new RuntimeException("You are already in a team");
+            throw new InvalidOperationException("You are already in a team");
         }
         return messageService.sendMessage(
                 sender,
@@ -82,7 +84,7 @@ public class UserService {
 
     private void validateUserForVerify(User user) {
         if (!checkPermission(user, Permission.Can_Create_Verified_Request)) {
-            throw new RuntimeException("Permission denied: Cannot send verification request.");
+            throw new PermissionDeniedException("Permission denied: Cannot send verification request.");
         }
     }
 }

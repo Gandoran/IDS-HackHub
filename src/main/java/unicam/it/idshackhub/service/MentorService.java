@@ -2,6 +2,7 @@ package unicam.it.idshackhub.service;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import unicam.it.idshackhub.exception.PermissionDeniedException;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
 import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.role.permission.Permission;
@@ -43,7 +44,7 @@ public class MentorService {
         User mentor = getEntity(userRepository, mentorId, "Mentor");
         Hackathon hackathon = getEntity(hackathonRepository, hackathonId, "Hackathon");
         if (!checkPermission(mentor, Permission.Can_Manage_Help_Request, hackathon)) {
-            throw new RuntimeException("Permission denied");
+            throw new PermissionDeniedException("Permission denied");
         }
         messageService.processReply(messageId, accept, mentor, hackathon);
     }
@@ -54,7 +55,7 @@ public class MentorService {
      */
     public boolean sendCallEmail(User mentor, ICalendarDetails event, Hackathon hackathon, User receiver) {
         if (!checkPermission(mentor, Permission.Can_Send_Email, hackathon)) {
-            throw new RuntimeException("Permission denied");
+            throw new PermissionDeniedException("Permission denied");
         }
         return emailService.sendEmailWithCalendar(event, receiver);
     }

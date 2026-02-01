@@ -55,7 +55,7 @@ public class EmailService {
                         "invite.ics"
                 );
             } catch (Exception e) {
-                System.err.println("Error during the sending " + e.getMessage());
+                throw new RuntimeException("Error during the sending " + e.getMessage());
             }
         });
         return true;
