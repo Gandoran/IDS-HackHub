@@ -2,10 +2,7 @@ package unicam.it.idshackhub.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import unicam.it.idshackhub.dto.CreateHackathonDTO;
 import unicam.it.idshackhub.dto.CreateTeamDTO;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
@@ -13,6 +10,8 @@ import unicam.it.idshackhub.model.hackathon.Schedule;
 import unicam.it.idshackhub.model.hackathon.TeamRules;
 import unicam.it.idshackhub.model.team.Team;
 import unicam.it.idshackhub.service.SystemService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/system")
@@ -43,4 +42,34 @@ public class SystemController {
         Hackathon hackathon = systemService.createHackathon(dto.organizerId(), dto.title(), dto.description(), dto.prize(), rules, schedule);
         return ResponseEntity.ok("Hackathon created with ID: " + hackathon.getId());
     }
+
+    @GetMapping("/teams")
+    public ResponseEntity<List<Team>> getAllTeams() {
+        List<Team> teams = systemService.getAllTeams();
+        return ResponseEntity.ok(teams);
+    }
+
+    // 2. Ottieni un singolo Team per ID
+    @GetMapping("/teams/{id}")
+    public ResponseEntity<Team> getTeamById(@PathVariable Long id) {
+        Team team = systemService.getTeamById(id);
+        // Nota: Idealmente qui si gestisce l'eccezione se il team non esiste (es. ritornando 404 Not Found)
+        return ResponseEntity.ok(team);
+    }
+
+    // 3. Ottieni tutti gli Hackathon
+    @GetMapping("/hackathons")
+    public ResponseEntity<List<Hackathon>> getAllHackathons() {
+        List<Hackathon> hackathons = systemService.getAllHackathons();
+        return ResponseEntity.ok(hackathons);
+    }
+
+    // 4. Ottieni un singolo Hackathon per ID
+    @GetMapping("/hackathons/{id}")
+    public ResponseEntity<Hackathon> getHackathonById(@PathVariable Long id) {
+        Hackathon hackathon = systemService.getHackathonById(id);
+        return ResponseEntity.ok(hackathon);
+    }
+
+
 }

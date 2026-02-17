@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import unicam.it.idshackhub.exception.InvalidOperationException;
 import unicam.it.idshackhub.exception.PermissionDeniedException;
+import unicam.it.idshackhub.exception.ResourceNotFoundException;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
 import unicam.it.idshackhub.model.hackathon.HackathonBuilder;
 import unicam.it.idshackhub.model.hackathon.Schedule;
@@ -18,6 +19,7 @@ import unicam.it.idshackhub.model.user.role.permission.Permission;
 import unicam.it.idshackhub.repository.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static unicam.it.idshackhub.service.EntityUtils.getEntity;
 import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
@@ -108,4 +110,37 @@ public class SystemService {
         userRepository.save(user);
         return team;
     }
+
+    /**
+     * Retrieves all teams from the system.
+     */
+    public List<Team> getAllTeams() {
+        return teamRepository.findAll();
+    }
+
+    /**
+     * Retrieves a specific team by its ID.
+     * Throws an EntityNotFoundException if the team does not exist.
+     */
+    public Team getTeamById(Long id) {
+        return teamRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Team not found with ID: " + id));
+    }
+
+    /**
+     * Retrieves all hackathons from the system.
+     */
+    public List<Hackathon> getAllHackathons() {
+        return hackathonRepository.findAll();
+    }
+
+    /**
+     * Retrieves a specific hackathon by its ID.
+     * Throws an EntityNotFoundException if the hackathon does not exist.
+     */
+    public Hackathon getHackathonById(Long id) {
+        return hackathonRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Hackathon not found with ID: " + id));
+    }
+
 }
