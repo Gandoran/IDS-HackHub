@@ -1,9 +1,6 @@
 package unicam.it.idshackhub.model.team;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,6 +19,14 @@ import java.util.Objects;
 @Entity
 @Table(name = "team")
 @Getter @Setter
+@AssociationOverride(
+        name = "members",
+        joinTable = @JoinTable(
+                name = "main_team_members",
+                joinColumns = @JoinColumn(name = "team_id"),
+                inverseJoinColumns = @JoinColumn(name = "user_id")
+        )
+)
 public class Team extends AbstractTeam {
 
     /**

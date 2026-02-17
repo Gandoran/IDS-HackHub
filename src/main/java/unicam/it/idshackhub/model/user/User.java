@@ -71,7 +71,7 @@ public class User {
     /**
      * The reference to the permanent Main Team this user belongs to (if any).
      */
-    @OneToOne @JoinColumn(name = "main_team_id")
+    @ManyToOne @JoinColumn(name = "main_team_id")
     private Team userTeam;
 
     /**

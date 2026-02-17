@@ -20,6 +20,14 @@ import java.util.Objects;
 @Entity
 @Table(name = "hackathon_team")
 @Getter @Setter
+@AssociationOverride(
+        name = "members",
+        joinTable = @JoinTable(
+                name = "hackathon_team_members",
+                joinColumns = @JoinColumn(name = "hackathon_team_id"),
+                inverseJoinColumns = @JoinColumn(name = "user_id")
+        )
+)
 public class HackathonTeam extends AbstractTeam {
 
     /**
