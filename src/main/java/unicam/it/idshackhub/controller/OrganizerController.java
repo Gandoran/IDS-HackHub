@@ -23,8 +23,14 @@ public class OrganizerController {
     }
 
     @PostMapping("{id}/proclaim-winner")
-    public ResponseEntity<?> proclaimWinner(@PathVariable Long hackathonId, @RequestParam Long organizerId) {
-        organizerService.proclaimWinner(organizerId, hackathonId);
+    public ResponseEntity<?> proclaimWinner(@PathVariable Long id, @RequestParam Long organizerId) {
+        organizerService.proclaimWinner(organizerId, id);
         return ResponseEntity.ok("Winner proclaimed.");
+    }
+
+    @PostMapping("{hackathonId}/force-update")
+    public ResponseEntity<?> forceUpdate(@PathVariable Long hackathonId) {
+        organizerService.forceUpdate(hackathonId);
+        return ResponseEntity.ok("Hackathon updated.");
     }
 }

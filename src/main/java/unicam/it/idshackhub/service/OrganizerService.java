@@ -121,4 +121,12 @@ public class OrganizerService {
         return winnerTeam;
     }
 
+    /**
+     * Forces the Hackathon to update its state.
+     */
+    public void forceUpdate(Long hackathonId) {
+        Hackathon hackathon = hackathonRepository.findById(hackathonId).orElseThrow();
+        hackathon.updateState();
+        hackathonRepository.save(hackathon);
+    }
 }
