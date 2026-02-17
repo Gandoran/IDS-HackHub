@@ -120,7 +120,7 @@ public class SystemService {
 
     /**
      * Retrieves a specific team by its ID.
-     * Throws an EntityNotFoundException if the team does not exist.
+     * Throws a ResourceNotFoundException if the team does not exist.
      */
     public Team getTeamById(Long id) {
         return teamRepository.findById(id)
@@ -136,7 +136,7 @@ public class SystemService {
 
     /**
      * Retrieves a specific hackathon by its ID.
-     * Throws an EntityNotFoundException if the hackathon does not exist.
+     * Throws a ResourceNotFoundException if the hackathon does not exist.
      */
     public Hackathon getHackathonById(Long id) {
         return hackathonRepository.findById(id)

@@ -49,22 +49,18 @@ public class SystemController {
         return ResponseEntity.ok(teams);
     }
 
-    // 2. Ottieni un singolo Team per ID
     @GetMapping("/teams/{id}")
     public ResponseEntity<Team> getTeamById(@PathVariable Long id) {
         Team team = systemService.getTeamById(id);
-        // Nota: Idealmente qui si gestisce l'eccezione se il team non esiste (es. ritornando 404 Not Found)
         return ResponseEntity.ok(team);
     }
 
-    // 3. Ottieni tutti gli Hackathon
     @GetMapping("/hackathons")
     public ResponseEntity<List<Hackathon>> getAllHackathons() {
         List<Hackathon> hackathons = systemService.getAllHackathons();
         return ResponseEntity.ok(hackathons);
     }
 
-    // 4. Ottieni un singolo Hackathon per ID
     @GetMapping("/hackathons/{id}")
     public ResponseEntity<Hackathon> getHackathonById(@PathVariable Long id) {
         Hackathon hackathon = systemService.getHackathonById(id);
