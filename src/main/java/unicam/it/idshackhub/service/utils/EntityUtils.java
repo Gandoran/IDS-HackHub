@@ -1,4 +1,4 @@
-package unicam.it.idshackhub.service;
+package unicam.it.idshackhub.service.utils;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;

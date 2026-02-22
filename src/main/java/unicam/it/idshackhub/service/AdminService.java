@@ -9,8 +9,8 @@ import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.role.permission.Permission;
 import unicam.it.idshackhub.repository.UserRepository;
 
-import static unicam.it.idshackhub.service.EntityUtils.getEntity;
-import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
+import static unicam.it.idshackhub.service.utils.EntityUtils.getEntity;
+import static unicam.it.idshackhub.service.utils.PermissionChecker.checkPermission;
 
 /**
  * Provides operations related to Admin-level use cases.
@@ -34,7 +34,7 @@ public class AdminService {
      * There are additional checks to ensure that the Admin is allowed to perform this action.
      */
     @Transactional
-    public Message manageVerificationRequest(Long adminId, Long messageId, boolean accept) {
+    public Message manageOrganizerRequest(Long adminId, Long messageId, boolean accept) {
         User admin = getEntity(userRepository, adminId, "Admin");
         if (!checkPermission(admin, Permission.Can_Manage_Verified_Request)) {
             throw new PermissionDeniedException("You are not an Admin.");

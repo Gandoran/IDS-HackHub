@@ -30,7 +30,7 @@ public class PayPalOrder implements  PayPal{
 
     public boolean captureOrder(String orderId) {
         OrdersCaptureRequest request = new OrdersCaptureRequest(orderId);
-        request.requestBody(new OrderRequest());
+        request.requestBody(new OrderActionRequest());
         try {
             Order result = httpClient.execute(request).result();
             return "COMPLETED".equals(result.status());
@@ -49,6 +49,7 @@ public class PayPalOrder implements  PayPal{
                         .amountWithBreakdown(new AmountWithBreakdown()
                                 .currencyCode("EUR")
                                 .value(amount))
-                        .payee(new Payee().email(email))));
+                        //.payee(new Payee().email(email))
+                ));
     }
 }

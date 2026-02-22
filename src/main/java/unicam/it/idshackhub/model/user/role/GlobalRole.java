@@ -11,7 +11,7 @@ import java.util.Set;
  * <p>
  * Global roles determine a user's baseline capabilities within the system, independent of
  * specific contexts like teams or events. For example, a {@code G_SystemAdmin} has powers
- * everywhere, while a {@code G_VerifiedUser} has unlocked creation capabilities.
+ * everywhere, while a {@code G_HackathonOrganizer} has unlocked creation capabilities.
  * </p>
  */
 public enum GlobalRole implements Role {
@@ -19,7 +19,7 @@ public enum GlobalRole implements Role {
     /**
      * A user identity that has been verified. Can create Hackathons and Teams.
      */
-    G_VerifiedUser(EnumSet.of(Permission.Can_Create_Hackathon, Permission.Can_Create_Team, Permission.Can_Send_Join_Request)),
+    G_HackathonOrganizer(EnumSet.of(Permission.Can_Create_Hackathon, Permission.Can_Create_Team, Permission.Can_Send_Join_Request)),
 
     /**
      * The platform administrator. Can manage user requests and system settings.

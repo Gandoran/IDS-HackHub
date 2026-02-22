@@ -2,10 +2,11 @@ package unicam.it.idshackhub.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import unicam.it.idshackhub.controller.dtoResponse.Mapper.IMapper;
+import unicam.it.idshackhub.controller.dtoResponse.Mapper.MapperDTO;
+import unicam.it.idshackhub.controller.dtoResponse.MessageResponseDTO;
+import unicam.it.idshackhub.dto.EmailCallDTO;
 import unicam.it.idshackhub.dto.HelpResponseDTO;
 import unicam.it.idshackhub.service.MentorService;
 
@@ -13,15 +14,24 @@ import unicam.it.idshackhub.service.MentorService;
 @RequestMapping("/api/mentor")
 public class MentorController {
     private final MentorService mentorService;
+    private final IMapper mapper;
 
     @Autowired
-    public MentorController(MentorService mentorService) {
+    public MentorController(MentorService mentorService, MapperDTO mapper) {
+        this.mapper = mapper;
         this.mentorService = mentorService;
     }
 
     @PostMapping("/requests/process")
-    public ResponseEntity<?> processRequest(@RequestBody HelpResponseDTO dto) {
-        mentorService.manageRequest(dto.mentorId(), dto.hackathonId(), dto.messageId(), dto.accepted());
-        return ResponseEntity.ok("Request processed.");
+    public ResponseEntity<MessageResponseDTO> processRequest(@RequestHeader Long mentorId, @RequestBody HelpResponseDTO dto) {
+        return ResponseEntity.ok(mapper.toDto(
+                mentorService.manageRequest(mentorId, dto.hackathonId(), dto.messageId(), dto.accepted())));
+    }
+
+    @PostMapping("/request/inviteWithEmail")
+    public ResponseEntity<?> inviteWithEmail(@RequestHeader Long mentorId,@RequestBody EmailCallDTO dto) {
+        mentorService.sendCallEmail(mentorId,dto.title(),dto.description(),
+                dto.virtualRoom(),dto.startTime(),dto.endTime(),dto.hackathonId(),dto.receiverId());
+        return ResponseEntity.ok("Invite email processed.");
     }
 }

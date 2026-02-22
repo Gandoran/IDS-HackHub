@@ -1,4 +1,4 @@
-package unicam.it.idshackhub.service;
+package unicam.it.idshackhub.service.utils;
 
 import unicam.it.idshackhub.model.user.User;
 import unicam.it.idshackhub.model.user.assignment.Context;

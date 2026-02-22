@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
+import static unicam.it.idshackhub.service.utils.PermissionChecker.checkPermission;
 
 /**
  * Provides operations related to Message lifecycle management.

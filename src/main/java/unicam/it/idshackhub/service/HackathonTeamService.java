@@ -7,6 +7,7 @@ import unicam.it.idshackhub.exception.InvalidOperationException;
 import unicam.it.idshackhub.exception.PermissionDeniedException;
 import unicam.it.idshackhub.exception.ResourceNotFoundException;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
+import unicam.it.idshackhub.model.message.Message;
 import unicam.it.idshackhub.model.message.MessageType;
 import unicam.it.idshackhub.model.team.HackathonTeam;
 import unicam.it.idshackhub.model.user.User;
@@ -16,12 +17,13 @@ import unicam.it.idshackhub.repository.HackathonRepository;
 import unicam.it.idshackhub.repository.HackathonTeamRepository;
 import unicam.it.idshackhub.repository.SubmissionRepository;
 import unicam.it.idshackhub.repository.UserRepository;
+import unicam.it.idshackhub.service.utils.EntityUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static unicam.it.idshackhub.service.EntityUtils.getEntity;
-import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
+import static unicam.it.idshackhub.service.utils.EntityUtils.getEntity;
+import static unicam.it.idshackhub.service.utils.PermissionChecker.checkPermission;
 
 /**
  * Handles operations performed by an Hackathon Team within a specific Hackathon context.
@@ -92,7 +94,7 @@ public class HackathonTeamService {
      * Sends a Help Request to the mentors of a given Hackathon.
      */
     @Transactional
-    public void requestHelp(Long userId, Long hackathonId, String problemDescription) {
+    public Message requestHelp(Long userId, Long hackathonId, String problemDescription) {
         User member = getEntity(userRepository, userId, "User");
         Hackathon hackathon = getEntity(hackathonRepository, hackathonId, "Hackathon");
 
@@ -105,8 +107,7 @@ public class HackathonTeamService {
         if(!checkPermission(member, Permission.Can_Create_Help_Request, hackathon)){
             throw new PermissionDeniedException("You cannot send help request.");
         }
-
-        messageService.sendMessage(member, null, MessageType.HELP_REQUEST, problemDescription, hackathon.getId());
+        return messageService.sendMessage(member, null, MessageType.HELP_REQUEST, problemDescription, hackathon.getId());
     }
 
 

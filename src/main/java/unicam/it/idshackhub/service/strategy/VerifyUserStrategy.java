@@ -29,13 +29,13 @@ public class VerifyUserStrategy implements MessageStrategy {
 
     /**
      * Processes the acceptance of a verification request.
-     * Updates the sender's global role to G_VerifiedUser and persists the change in the repository.
+     * Updates the sender's global role to G_HackathonOrganizer and persists the change in the repository.
      */
     @Override
     @Transactional
     public void executeAccept(Message message) {
         User userToVerify = message.getSender();
-        userToVerify.setGlobalRole(GlobalRole.G_VerifiedUser);
+        userToVerify.setGlobalRole(GlobalRole.G_HackathonOrganizer);
         userRepository.save(userToVerify);
         messageRepository.save(message);
         executeResponse(message, "Your verification request was approved!", ActionStatus.ACCEPTED);

@@ -3,6 +3,11 @@ package unicam.it.idshackhub.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import unicam.it.idshackhub.controller.dtoResponse.HackathonResponseDTO;
+import unicam.it.idshackhub.controller.dtoResponse.Mapper.IMapper;
+import unicam.it.idshackhub.controller.dtoResponse.Mapper.MapperDTO;
+import unicam.it.idshackhub.controller.dtoResponse.SubmissionResponseDTO;
+import unicam.it.idshackhub.dto.GetHackathonDTO;
 import unicam.it.idshackhub.dto.VoteDTO;
 import unicam.it.idshackhub.service.JudgeService;
 
@@ -11,21 +16,24 @@ import unicam.it.idshackhub.service.JudgeService;
 public class JudgeController {
 
     private final JudgeService judgeService;
+    private final IMapper mapper;
 
     @Autowired
-    public JudgeController(JudgeService judgeService) {
+    public JudgeController(JudgeService judgeService, MapperDTO mapper) {
+        this.mapper = mapper;
         this.judgeService = judgeService;
     }
 
     @PostMapping("/vote")
-    public ResponseEntity<?> voteSubmission(@RequestBody VoteDTO dto) {
-        judgeService.judgeSubmission(dto.judgeId(), dto.submissionId(), dto.hackathonId(), dto.vote());
-        return ResponseEntity.ok("Vote assigned: " + dto.vote());
+    public ResponseEntity<SubmissionResponseDTO> voteSubmission(@RequestHeader Long judgeId, @RequestBody VoteDTO dto) {
+        return ResponseEntity.ok(mapper.toDto(
+                judgeService.judgeSubmission(judgeId, dto.submissionId(), dto.hackathonId(), dto.vote())));
+
     }
 
     @PostMapping("/close-evaluation")
-    public ResponseEntity<?> closeEvaluation(@RequestParam Long judgeId, @RequestParam Long hackathonId) {
-        judgeService.closeEvaluationState(judgeId, hackathonId);
-        return ResponseEntity.ok("Evaluation closed.");
+    public ResponseEntity<HackathonResponseDTO> closeEvaluation(@RequestHeader Long judgeId, @RequestBody GetHackathonDTO dto) {
+        return ResponseEntity.ok(mapper.toDto(
+            judgeService.closeEvaluationState(judgeId, dto.hackathonId())));
     }
 }

@@ -14,8 +14,8 @@ import unicam.it.idshackhub.repository.HackathonRepository;
 import unicam.it.idshackhub.repository.SubmissionRepository;
 import unicam.it.idshackhub.repository.UserRepository;
 
-import static unicam.it.idshackhub.service.EntityUtils.getEntity;
-import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
+import static unicam.it.idshackhub.service.utils.EntityUtils.getEntity;
+import static unicam.it.idshackhub.service.utils.PermissionChecker.checkPermission;
 
 /**
  * Implements judge-related use cases for a Hackathon.
@@ -43,7 +43,7 @@ public class JudgeService {
      * Assigns a vote (0-10) to a submission within a Hackathon.
      */
     @Transactional
-    public Integer judgeSubmission(Long judgeId, Long submissionId, Long hackathonId, int vote) {
+    public Submission judgeSubmission(Long judgeId, Long submissionId, Long hackathonId, int vote) {
         User judge = getEntity(userRepository, judgeId, "Judge");
         Submission submission = getEntity(submissionRepository, submissionId, "Submission");
         Hackathon hackathon = getEntity(hackathonRepository, hackathonId, "Hackathon");
@@ -55,8 +55,7 @@ public class JudgeService {
             throw new InvalidOperationException("Hackathon not in the evaluation state");
         }
         submission.setVote(vote);
-        submissionRepository.save(submission);
-        return submission.getVote();
+        return submissionRepository.save(submission);
     }
 
     /**
@@ -67,7 +66,7 @@ public class JudgeService {
      * </p>
      */
     @Transactional
-    public HackathonStatus closeEvaluationState(Long judgeId, Long hackathonId) {
+    public Hackathon closeEvaluationState(Long judgeId, Long hackathonId) {
         User judge = getEntity(userRepository, judgeId, "Judge");
         Hackathon hackathon = getEntity(hackathonRepository, hackathonId, "Hackathon");
 
@@ -80,7 +79,6 @@ public class JudgeService {
             }
         }
         hackathon.setStatus(HackathonStatus.CONCLUSION);
-        hackathonRepository.save(hackathon);
-        return hackathon.getStatus();
+        return hackathonRepository.save(hackathon);
     }
 }

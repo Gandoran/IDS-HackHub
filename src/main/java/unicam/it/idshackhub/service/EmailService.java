@@ -48,7 +48,8 @@ public class EmailService {
                 String subject = "Invito: " + event.getTitle();
                 String body = buildEmailBody(event);
                 smtpService.sendEmailWithAttachment(
-                        receiver.getEmail(),
+                        "giacomo.carloni@studenti.unicam.it",
+                        //receiver.getEmail(),
                         subject,
                         body,
                         icsData,

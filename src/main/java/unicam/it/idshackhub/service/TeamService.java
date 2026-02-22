@@ -22,8 +22,8 @@ import unicam.it.idshackhub.repository.UserRepository;
 
 import java.util.List;
 
-import static unicam.it.idshackhub.service.EntityUtils.getEntity;
-import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
+import static unicam.it.idshackhub.service.utils.EntityUtils.getEntity;
+import static unicam.it.idshackhub.service.utils.PermissionChecker.checkPermission;
 
 /**
  * Manages team participation within a Hackathon.
@@ -69,7 +69,7 @@ public class TeamService {
     @Transactional
     public HackathonTeam registerHackathonTeam(Long teamLeaderId, String name, String description, Long hackathonTeamLeaderId, List<Long> membersId, Long hackathonID) {
         User teamLeader = getEntity(userRepository, teamLeaderId, "Leader");
-        User hackathonTeamLeader = getEntity(userRepository, hackathonTeamLeaderId, "HackTeam Leader");
+        User hackathonTeamLeader = getEntity(userRepository, hackathonTeamLeaderId, "hackathonTeamLeader");
         Hackathon hackathon = getEntity(hackathonRepository, hackathonID, "Hackathon");
 
         List<User> members = userRepository.findAllById(membersId);
@@ -105,7 +105,7 @@ public class TeamService {
      * The user will receive an invite Message.
      */
     @Transactional
-    public Message inviteUserToTeam(Long invitedUserId, Long teamLeaderId) {
+    public Message inviteUserToTeam(Long teamLeaderId,Long invitedUserId) {
         User invitedUser = getEntity(userRepository, invitedUserId, "Invited User");
         User teamLeader = getEntity(userRepository, teamLeaderId, "Team Leader");
 

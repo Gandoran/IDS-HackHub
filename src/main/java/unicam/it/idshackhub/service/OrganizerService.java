@@ -17,8 +17,8 @@ import unicam.it.idshackhub.repository.HackathonRepository;
 import unicam.it.idshackhub.repository.SubmissionRepository;
 import unicam.it.idshackhub.repository.UserRepository;
 
-import static unicam.it.idshackhub.service.EntityUtils.getEntity;
-import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
+import static unicam.it.idshackhub.service.utils.EntityUtils.getEntity;
+import static unicam.it.idshackhub.service.utils.PermissionChecker.checkPermission;
 
 /**
  * Provides operations related to Organizer-level use cases.

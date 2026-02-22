@@ -3,6 +3,10 @@ package unicam.it.idshackhub.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import unicam.it.idshackhub.controller.dtoResponse.Mapper.IMapper;
+import unicam.it.idshackhub.controller.dtoResponse.Mapper.MapperDTO;
+import unicam.it.idshackhub.controller.dtoResponse.MessageResponseDTO;
+import unicam.it.idshackhub.controller.dtoResponse.SubmissionResponseDTO;
 import unicam.it.idshackhub.dto.HelpRequestDTO;
 import unicam.it.idshackhub.dto.SubmissionDTO;
 import unicam.it.idshackhub.model.user.User;
@@ -15,22 +19,25 @@ import java.util.List;
 public class HackathonTeamController {
 
     private final HackathonTeamService hackathonTeamService;
+    private final IMapper mapper;
 
     @Autowired
-    public HackathonTeamController(HackathonTeamService hackathonTeamService) {
+    public HackathonTeamController(HackathonTeamService hackathonTeamService, MapperDTO mapper) {
+        this.mapper = mapper;
         this.hackathonTeamService = hackathonTeamService;
     }
 
     @PostMapping("/submission")
-    public ResponseEntity<?> postSubmission(@RequestBody SubmissionDTO dto) {
-        hackathonTeamService.postSubmission(dto.hackathonLeaderId(), dto.description(), dto.hackathonTeamId(), dto.hackathonId());
-        return ResponseEntity.ok("Submission posted successfully.");
+    public ResponseEntity<SubmissionResponseDTO> postSubmission(@RequestHeader Long hackathonTeamLeaderId, @RequestBody SubmissionDTO dto) {
+        return ResponseEntity.ok(mapper.toDto(
+                hackathonTeamService.postSubmission(hackathonTeamLeaderId, dto.description(), dto.hackathonTeamId(), dto.hackathonId())));
     }
 
     @PostMapping("/help")
-    public ResponseEntity<?> requestHelp(@RequestBody HelpRequestDTO dto) {
-        hackathonTeamService.requestHelp(dto.userId(), dto.hackathonId(), dto.description());
-        return ResponseEntity.ok("Help request sent to mentors.");
+    public ResponseEntity<MessageResponseDTO> requestHelp(@RequestHeader Long memberId, @RequestBody HelpRequestDTO dto) {
+        return ResponseEntity.ok(mapper.toDto(
+                hackathonTeamService.requestHelp(memberId, dto.hackathonId(), dto.description())));
+
     }
 
     @GetMapping("/{id}/participants")

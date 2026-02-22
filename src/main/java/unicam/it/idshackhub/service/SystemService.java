@@ -21,8 +21,8 @@ import unicam.it.idshackhub.repository.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static unicam.it.idshackhub.service.EntityUtils.getEntity;
-import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
+import static unicam.it.idshackhub.service.utils.EntityUtils.getEntity;
+import static unicam.it.idshackhub.service.utils.PermissionChecker.checkPermission;
 
 /**
  * Provides system-level use cases that create core aggregates such as Hackathons and Teams.

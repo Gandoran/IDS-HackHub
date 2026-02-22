@@ -2,8 +2,7 @@ package unicam.it.idshackhub.dto;
 
 import java.time.LocalDateTime;
 
-public record CreateHackathonDTO(
-        Long organizerId,
+public record HackathonDTO(
         String title,
         String description,
         Double prize,

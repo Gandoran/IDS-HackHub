@@ -5,17 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import unicam.it.idshackhub.model.hackathon.Hackathon;
 import unicam.it.idshackhub.model.hackathon.state.HackathonStatus;
-import unicam.it.idshackhub.model.team.HackathonTeam;
-import unicam.it.idshackhub.model.user.User;
-import unicam.it.idshackhub.model.user.role.permission.Permission;
 import unicam.it.idshackhub.repository.HackathonRepository;
-import unicam.it.idshackhub.repository.SubmissionRepository;
-import unicam.it.idshackhub.repository.UserRepository;
 
 import java.util.List;
 
-import static unicam.it.idshackhub.service.EntityUtils.getEntity;
-import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
+import static unicam.it.idshackhub.service.utils.PermissionChecker.checkPermission;
 
 /**
  * Provides operations related to {@link unicam.it.idshackhub.model.hackathon.Hackathon} lifecycle management.

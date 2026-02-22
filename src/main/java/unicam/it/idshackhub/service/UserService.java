@@ -13,8 +13,8 @@ import unicam.it.idshackhub.model.user.role.permission.Permission;
 import unicam.it.idshackhub.repository.TeamRepository;
 import unicam.it.idshackhub.repository.UserRepository;
 
-import static unicam.it.idshackhub.service.EntityUtils.getEntity;
-import static unicam.it.idshackhub.service.PermissionChecker.checkPermission;
+import static unicam.it.idshackhub.service.utils.EntityUtils.getEntity;
+import static unicam.it.idshackhub.service.utils.PermissionChecker.checkPermission;
 
 /**
  * Provides operations related to User lifecycle management.
